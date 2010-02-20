@@ -11,6 +11,15 @@ endif (NOT PYTHON_INCLUDE_PATH)
 find_package(NumPy REQUIRED)
 include_directories(${PYTHON_INCLUDE_PATH} ${NUMPY_INCLUDE_PATH})
 
+enable_testing()
+
+# this is done by cmake anyway, no matter what actual COMMAND we put here (!):
+add_custom_target(test
+    COMMAND ctest
+)
+
+add_subdirectory(tests)
+
 
 
 set(HERMES_COMMON hermes_common)
