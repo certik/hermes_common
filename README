@@ -8,5 +8,10 @@ Currently it includes the matrix support and Python wrappers.
 Installation
 ------------
 
-cmake .
-make
+$ cmake .
+$ make
+
+Tests
+-----
+
+$ make test
