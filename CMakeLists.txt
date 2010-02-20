@@ -1,6 +1,10 @@
+project(hermes_common)
 cmake_minimum_required(VERSION 2.6)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+find_package(PythonLibs REQUIRED)
+find_package(NumPy REQUIRED)
 
 include(UseCython)
 # if the user specified PYTHON_INCLUDE_PATH, let's use that, otherwise let's
@@ -17,6 +21,8 @@ enable_testing()
 add_custom_target(test
     COMMAND ctest
 )
+
+#PYTHONPATH=${hermes_common_SOURCE_DIR}
 
 add_subdirectory(tests)
 
