@@ -113,6 +113,24 @@ cdef api object c2numpy_double_inplace(double *A, int len):
     cdef npy_intp dim = len
     return PyArray_SimpleNewFromData(1, &dim, NPY_DOUBLE, A)
 
+_AA = None
+
+cdef api void numpy2c_int_inplace(object A_n, int **A_c, int *n):
+    """
+    Returns the C array, that points to the numpy array (inplace).
+
+    Only if strides != sizeof(int), the data get copied first.
+    """
+    cdef ndarray A = A_n
+    if not (A.nd == 1 and A.strides[0] == sizeof(int)):
+        from numpy import array
+        A = array(A.flat, dtype="int32")
+        # this is needed so that numpy doesn't dealocate the arrays
+        global _AA
+        _AA = A
+    n[0] = len(A)
+    A_c[0] = <int *>(A.data)
+
 cdef api void numpy2c_double_inplace(object A_n, double **A_c, int *n):
     """
     Returns the C array, that points to the numpy array (inplace).
@@ -123,6 +141,9 @@ cdef api void numpy2c_double_inplace(object A_n, double **A_c, int *n):
     if not (A.nd == 1 and A.strides[0] == sizeof(double)):
         from numpy import array
         A = array(A.flat, dtype="double")
+        # this is needed so that numpy doesn't dealocate the arrays
+        global _AA
+        _AA = A
     n[0] = len(A)
     A_c[0] = <double *>(A.data)
 
