@@ -22,6 +22,33 @@ void test_basic()
     _assert(i == 10);
 }
 
+void test_numpy()
+{
+    cmd("from numpy import array");
+    cmd("a = array(range(20), dtype='double')");
+    cmd("assert a.strides == (8,)");
+    cmd("b = a[::5]");
+    cmd("assert b.strides == (40,)");
+    double *A;
+    int n;
+    numpy2c_double_inplace(get_object("a"), &A, &n);
+    _assert(n == 20);
+    _assert(
+            (fabs(A[0] - 0.)  < 1e-10) &&
+            (fabs(A[1] - 1.)  < 1e-10) &&
+            (fabs(A[2] - 2.) < 1e-10) &&
+            (fabs(A[3] - 3.) < 1e-10)
+           );
+    numpy2c_double_inplace(get_object("b"), &A, &n);
+    _assert(n == 4);
+    _assert(
+            (fabs(A[0] - 0.)  < 1e-10) &&
+            (fabs(A[1] - 5.)  < 1e-10) &&
+            (fabs(A[2] - 10.) < 1e-10) &&
+            (fabs(A[3] - 15.) < 1e-10)
+           );
+}
+
 int main(int argc, char* argv[])
 {
     try {
@@ -33,6 +60,7 @@ int main(int argc, char* argv[])
             throw std::runtime_error("hermes_common failed to import.");
 
         test_basic();
+        test_numpy();
 
         return ERROR_SUCCESS;
     } catch(std::exception const &ex) {
