@@ -120,6 +120,10 @@ cdef api void numpy2c_int_inplace(object A_n, int **A_c, int *n):
     Returns the C array, that points to the numpy array (inplace).
 
     Only if strides != sizeof(int), the data get copied first.
+
+    Important note: you need to use the A_c array immediately after calling
+    this function in C, otherwise numpy could deallocate the array, especially
+    if the _AA global variable was deallocated.
     """
     cdef ndarray A = A_n
     if not (A.nd == 1 and A.strides[0] == sizeof(int)):
@@ -136,6 +140,10 @@ cdef api void numpy2c_double_inplace(object A_n, double **A_c, int *n):
     Returns the C array, that points to the numpy array (inplace).
 
     Only if strides != sizeof(double), the data get copied first.
+
+    Important note: you need to use the A_c array immediately after calling
+    this function in C, otherwise numpy could deallocate the array, especially
+    if the _AA global variable was deallocated.
     """
     cdef ndarray A = A_n
     if not (A.nd == 1 and A.strides[0] == sizeof(double)):
