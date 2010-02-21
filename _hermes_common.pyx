@@ -114,6 +114,11 @@ cdef api object c2numpy_double_inplace(double *A, int len):
     return PyArray_SimpleNewFromData(1, &dim, NPY_DOUBLE, A)
 
 cdef api void numpy2c_double_inplace(object A_n, double **A_c, int *n):
+    """
+    Returns the C array, that points to the numpy array (inplace).
+
+    Only if strides != sizeof(double), the data get copied first.
+    """
     cdef ndarray A = A_n
     if not (A.nd == 1 and A.strides[0] == sizeof(double)):
         from numpy import array
