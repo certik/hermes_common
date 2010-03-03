@@ -14,7 +14,7 @@ macro(CYTHON_ADD_MODULE name)
         OUTPUT ${name}.cpp
         COMMAND cython
         ARGS -I ${CYTHON_INCLUDE_DIRECTORIES} -o ${name}.cpp ${CMAKE_CURRENT_SOURCE_DIR}/${name}.pyx
-        DEPENDS ${name}.pyx
+        DEPENDS ${name}.pyx ${name}.pxd
         COMMENT "Cythonizing ${name}.pyx")
     # When linking Python extension modules, a special care must be taken about
     # the link flags, which is platform dependent:
