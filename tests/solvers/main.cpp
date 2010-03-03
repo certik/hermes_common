@@ -38,6 +38,31 @@ void test_solver1()
     _assert(fabs(res[3] - 0.2) < EPS);
 }
 
+void test_solver2()
+{
+    CooMatrix A(4);
+    A.add(0, 0, -1);
+    A.add(1, 1, -1);
+    A.add(2, 2, -1);
+    A.add(3, 3, -1);
+    A.add(0, 1, 2);
+    A.add(1, 0, 2);
+    A.add(1, 2, 2);
+    A.add(2, 1, 2);
+    A.add(2, 3, 2);
+    A.add(3, 2, 2);
+
+    double res[4] = {1., 1., 1., 1.};
+
+    DenseMatrix B(&A);
+
+    solve_linear_system_dense(&B, res);
+    _assert(fabs(res[0] - 0.2) < EPS);
+    _assert(fabs(res[1] - 0.6) < EPS);
+    _assert(fabs(res[2] - 0.6) < EPS);
+    _assert(fabs(res[3] - 0.2) < EPS);
+}
+
 int main(int argc, char* argv[])
 {
     try {
@@ -47,6 +72,7 @@ int main(int argc, char* argv[])
         PySys_SetArgv(argc, argv);
 
         test_solver1();
+        test_solver2();
 
         return ERROR_SUCCESS;
     } catch(std::exception const &ex) {
