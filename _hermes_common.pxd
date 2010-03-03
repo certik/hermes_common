@@ -95,4 +95,5 @@ cdef extern from "matrix.h":
         int *get_JA()
         double *get_A()
         int get_nnz()
-    c_CSRMatrix *new_CSRMatrix "new CSRMatrix" (int size)
+    c_CSRMatrix *new_CSRMatrix_size "new CSRMatrix" (int size)
+    c_CSRMatrix *new_CSRMatrix_coo_matrix "new CSRMatrix" (c_CooMatrix *m)

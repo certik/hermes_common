@@ -63,10 +63,21 @@ cdef class CooMatrix(SparseMatrix):
         n = self.get_size()
         return coo_matrix((data, (row, col)), shape=(n, n))
 
+# XXX: make this more general:
+cdef CooMatrix _C(M):
+    return M
+
 cdef class CSRMatrix(SparseMatrix):
 
-    def __cinit__(self, size=0):
-        self.thisptr = <c_Matrix *>new_CSRMatrix(size)
+    def __cinit__(self, M):
+        if isinstance(M, (int, long)):
+            size = M
+            self.thisptr = <c_Matrix *>new_CSRMatrix_size(size)
+        elif isinstance(M, CooMatrix):
+            self.thisptr = <c_Matrix *>new_CSRMatrix_coo_matrix(
+                    <c_CooMatrix*>(_C(M).thisptr))
+        else:
+            raise Exception("Not implemented.")
 
     @property
     def IA(self):
