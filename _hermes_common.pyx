@@ -85,7 +85,7 @@ cdef class CSRMatrix(SparseMatrix):
         Returns (row, col, data) arrays.
         """
         cdef c_CSRMatrix *_thisptr = <c_CSRMatrix*>(self.thisptr)
-        return c2numpy_int_inplace(_thisptr.get_IA(), self.get_size())
+        return c2numpy_int_inplace(_thisptr.get_IA(), self.get_size()+1)
 
     @property
     def JA(self):
@@ -109,7 +109,7 @@ cdef class CSRMatrix(SparseMatrix):
         """
         from scipy.sparse import csr_matrix
         n = self.get_size()
-        return csr_matrix((self.A, self.IA, self.JA), shape=(n, n))
+        return csr_matrix((self.A, self.JA, self.IA), shape=(n, n))
 
 
 #-----------------------------------------------------------------------
