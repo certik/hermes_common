@@ -5,6 +5,8 @@
 
 #include "Python.h"
 
+#define EPS 1e-12
+
 #define ERROR_SUCCESS                               0
 #define ERROR_FAILURE                              -1
 
@@ -13,19 +15,27 @@ void _assert(bool a)
     if (!a) throw std::runtime_error("Assertion failed.");
 }
 
-void test_matrix1()
+void test_solver1()
 {
-    CooMatrix m(5);
-    m.add(1, 3, 3.5);
-    m.add(2, 3, 4.5);
-    m.add(3, 4, 1.5);
-    m.add(4, 2, 1.5);
-    m.add(2, 3, 1);
-    m.print();
+    CooMatrix A(4);
+    A.add(0, 0, -1);
+    A.add(1, 1, -1);
+    A.add(2, 2, -1);
+    A.add(3, 3, -1);
+    A.add(0, 1, 2);
+    A.add(1, 0, 2);
+    A.add(1, 2, 2);
+    A.add(2, 1, 2);
+    A.add(2, 3, 2);
+    A.add(3, 2, 2);
 
-    printf("----\n");
-    CSRMatrix n(&m);
-    n.print();
+    double res[4] = {1., 1., 1., 1.};
+
+    solve_linear_system(&A, res);
+    _assert(fabs(res[0] - 0.2) < EPS);
+    _assert(fabs(res[1] - 0.6) < EPS);
+    _assert(fabs(res[2] - 0.6) < EPS);
+    _assert(fabs(res[3] - 0.2) < EPS);
 }
 
 int main(int argc, char* argv[])
@@ -36,7 +46,7 @@ int main(int argc, char* argv[])
         Py_Initialize();
         PySys_SetArgv(argc, argv);
 
-        test_matrix1();
+        test_solver1();
 
         return ERROR_SUCCESS;
     } catch(std::exception const &ex) {
