@@ -3,6 +3,11 @@
 # file for the exact terms).
 # Email: hermes1d@googlegroups.com, home page: http://hpfem.org/
 
+cdef extern from *:
+    ctypedef char* char_p       "char*"
+    ctypedef char* const_char_p "const char*"
+
+
 cdef extern from "math.h":
 
     double c_sqr "sqr"(double x)

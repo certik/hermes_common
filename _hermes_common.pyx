@@ -3,6 +3,14 @@
 # file for the exact terms).
 # Email: hermes1d@googlegroups.com, home page: http://hpfem.org/
 
+cdef inline object cp2str(const_char_p p):
+    if p == NULL: return None
+    else:         return p
+
+cdef inline char_p str2cp(object s) except ? NULL:
+    if s is None: return NULL
+    else:         return s
+
 
 #-----------------------------------------------------------------------
 # Common C++ <-> Python+NumPy conversion tools:
@@ -14,7 +22,7 @@ import_array()
 
 global_namespace = {"verbose": False}
 
-cdef api void cmd(char *text):
+cdef api void cmd(const_char_p text):
     """
     Runs the command "text" in the Python namespace.
     """
@@ -24,7 +32,7 @@ cdef api void cmd(char *text):
 cdef api void set_verbose_cmd(int verbose):
     global_namespace["verbose"] = verbose
 
-cdef api void insert_object(char *name, object o):
+cdef api void insert_object(const_char_p name, object o):
     """
     Inserts an object into the global namespace.
 
@@ -53,7 +61,7 @@ cdef api void insert_object(char *name, object o):
     """
     global_namespace.update({name: o})
 
-cdef api object get_object(char *name):
+cdef api object get_object(const_char_p name):
     """
     Retrieves an object from the Python namespace.
 
@@ -155,7 +163,7 @@ cdef api void numpy2c_double_inplace(object A_n, double **A_c, int *n):
     n[0] = len(A)
     A_c[0] = <double *>(A.data)
 
-cdef api object run_cmd(char *text, object namespace):
+cdef api object run_cmd(const_char_p text, object namespace):
     try:
         verbose = namespace.get("verbose")
         if verbose:
