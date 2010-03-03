@@ -23,12 +23,12 @@ add_custom_target(test
 )
 
 #PYTHONPATH=${hermes_common_SOURCE_DIR}
+set(HERMES_COMMON hermes_common)
 
 add_subdirectory(tests)
 
 
 
-set(HERMES_COMMON hermes_common)
 
 set(SRC
     common.cpp
