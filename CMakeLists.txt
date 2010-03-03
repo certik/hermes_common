@@ -33,6 +33,7 @@ add_subdirectory(tests)
 set(SRC
     common.cpp
     matrix.cpp
+    python_solvers.cpp
     )
 
 add_library(${HERMES_COMMON} SHARED ${SRC})

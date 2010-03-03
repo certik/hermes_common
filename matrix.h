@@ -3,8 +3,8 @@
 // file for the exact terms).
 // Email: hermes1d@googlegroups.com, home page: http://hpfem.org/
 
-#ifndef __HERMES1D_MATRIX_H
-#define __HERMES1D_MATRIX_H
+#ifndef __HERMES_COMMON_MATRIX_H
+#define __HERMES_COMMON_MATRIX_H
 
 #include <math.h>
 #include <stdlib.h>
