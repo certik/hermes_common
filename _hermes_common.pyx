@@ -25,9 +25,7 @@ cdef class Matrix:
         self.thisptr.add(m, n, v)
 
 cdef class SparseMatrix(Matrix):
-
-    def __str__(self):
-        return "ok"
+    pass
 
 cdef class CooMatrix(SparseMatrix):
 
@@ -62,6 +60,9 @@ cdef class CooMatrix(SparseMatrix):
         row, col, data = self.row_col_data
         n = self.get_size()
         return coo_matrix((data, (row, col)), shape=(n, n))
+
+    def __str__(self):
+        return str(self.to_scipy_coo())
 
 # XXX: make this more general:
 cdef CooMatrix _C(M):
@@ -116,6 +117,9 @@ cdef class CSRMatrix(SparseMatrix):
         from scipy.sparse import csr_matrix
         n = self.get_size()
         return csr_matrix((self.A, self.JA, self.IA), shape=(n, n))
+
+    def __str__(self):
+        return str(self.to_scipy_csr())
 
 
 #-----------------------------------------------------------------------
