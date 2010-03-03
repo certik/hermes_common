@@ -371,6 +371,12 @@ class DenseMatrix : public Matrix {
 
 class CSRMatrix : public Matrix {
     public:
+        CSRMatrix(int size) {
+            this->size = size;
+            this->A = NULL;
+            this->IA = NULL;
+            this->JA = NULL;
+        }
         CSRMatrix(CooMatrix *m) {
             DenseMatrix *dmat = new DenseMatrix(m);
             this->add_from_dense_matrix(dmat);
@@ -424,6 +430,9 @@ class CSRMatrix : public Matrix {
 
         virtual int get_size() {
             return this->size;
+        }
+        int get_nnz() {
+            return this->nnz;
         }
         virtual void copy_into(Matrix *m) {
             error("CSR matrix copy_into() not implemented.");

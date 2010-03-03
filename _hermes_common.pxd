@@ -88,3 +88,11 @@ cdef extern from "matrix.h":
         int triplets_len()
         void get_row_col_data(int *row, int *col, double *data)
     c_CooMatrix *new_CooMatrix "new CooMatrix" (int size)
+
+    cdef struct c_CSRMatrix "CSRMatrix":
+        CSRMatrix(int size)
+        int *get_IA()
+        int *get_JA()
+        double *get_A()
+        int get_nnz()
+    c_CSRMatrix *new_CSRMatrix "new CSRMatrix" (int size)

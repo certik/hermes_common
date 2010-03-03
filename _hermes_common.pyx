@@ -63,6 +63,43 @@ cdef class CooMatrix(SparseMatrix):
         n = self.get_size()
         return coo_matrix((data, (row, col)), shape=(n, n))
 
+cdef class CSRMatrix(SparseMatrix):
+
+    def __cinit__(self, size=0):
+        self.thisptr = <c_Matrix *>new_CSRMatrix(size)
+
+    @property
+    def IA(self):
+        """
+        Returns (row, col, data) arrays.
+        """
+        cdef c_CSRMatrix *_thisptr = <c_CSRMatrix*>(self.thisptr)
+        return c2numpy_int_inplace(_thisptr.get_IA(), self.get_size())
+
+    @property
+    def JA(self):
+        """
+        Returns (row, col, data) arrays.
+        """
+        cdef c_CSRMatrix *_thisptr = <c_CSRMatrix*>(self.thisptr)
+        return c2numpy_int_inplace(_thisptr.get_JA(), _thisptr.get_nnz())
+
+    @property
+    def A(self):
+        """
+        Returns (row, col, data) arrays.
+        """
+        cdef c_CSRMatrix *_thisptr = <c_CSRMatrix*>(self.thisptr)
+        return c2numpy_double_inplace(_thisptr.get_A(), _thisptr.get_nnz())
+
+    def to_scipy_csr(self):
+        """
+        Converts itself to the scipy sparse CSR format.
+        """
+        from scipy.sparse import csr_matrix
+        n = self.get_size()
+        return csr_matrix((self.A, self.IA, self.JA), shape=(n, n))
+
 
 #-----------------------------------------------------------------------
 # Common C++ <-> Python+NumPy conversion tools:
