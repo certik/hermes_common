@@ -9,14 +9,13 @@ cdef extern from *:
 
 
 cdef extern from "math.h":
-
     double c_sqr "sqr"(double x)
     double c_sqrt "sqrt"(double x)
     double c_atan "atan"(double x)
     double c_pi "M_PI"
 
-cdef extern from "stdlib.h":
 
+cdef extern from "stdlib.h":
     ctypedef unsigned long size_t
     void *malloc (size_t size)
     void free(void *mem)
@@ -25,7 +24,6 @@ cdef extern from "stdlib.h":
     void exit(int exit_code)
 
 cdef extern from "arrayobject.h":
-
     cdef enum NPY_TYPES:
         NPY_BOOL
         NPY_BYTE
@@ -70,6 +68,7 @@ cdef extern from "Python.h":
     void Py_INCREF(PyObject *x)
     void Py_DECREF(PyObject *x)
 
+
 cdef extern from "stdcython.h":
     void init_global_empty_tuple()
     object PY_NEW(object t)
@@ -78,6 +77,7 @@ cdef extern from "stdcython.h":
     void delete(...)
 
     void throw_exception(char *msg)
+
 
 cdef struct c_Matrix "Matrix":
     int get_size()
