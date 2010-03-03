@@ -115,6 +115,21 @@ CSRMatrix::CSRMatrix(CooMatrix *m) {
     //delete dmat;
 }
 
+void CSRMatrix::print() {
+    insert_object("m", c2py_CSRMatrix(this));
+    cmd("S = str(m.to_scipy_csr())");
+    printf("%s\n", py2c_str(get_object("S")));
+}
+
+void CooMatrix::print() {
+    // this is necessary, so that we can use Python from matrix.cpp:
+    if (import__hermes_common())
+        throw std::runtime_error("hermes_common failed to import.");
+    insert_object("m", c2py_CooMatrix(this));
+    cmd("S = str(m.to_scipy_coo())");
+    printf("%s\n", py2c_str(get_object("S")));
+}
+
 void solve_linear_system_dense(DenseMatrix *mat, double *res)
 {
     int n = mat->get_size();

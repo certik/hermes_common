@@ -264,13 +264,7 @@ class CooMatrix : public Matrix {
             return this->size;
         }
 
-        virtual void print() {
-            Triple *t = this->list;
-            while (t != NULL) {
-                printf("Matrix_print (%d, %d): %f\n", t->i, t->j, t->v);
-                t = t->next;
-            }
-        }
+        virtual void print();
 
         virtual void times_vector(double* vec, double* result, int rank) {
             for (int i=0; i < rank; i++) result[i] = 0;
@@ -434,18 +428,7 @@ class CSRMatrix : public Matrix {
             error("CSR matrix copy_into() not implemented.");
         }
 
-        virtual void print() {
-            printf("(I, J): value:\n");
-            for (int i = 0; i < this->nnz; i++) {
-                printf("(%d, %d): %f\n", -1,
-                        this->JA[i], this->A[i]);
-            }
-            printf("IA:\n");
-            for (int i = 0; i < this->size+1; i++) {
-                printf("%d ", this->IA[i]);
-            }
-            printf("\n");
-        }
+        virtual void print();
 
         virtual void times_vector(double* vec, double* result, int rank) {
 	    error("times_vector() in CSR matrix not implemented yet.");

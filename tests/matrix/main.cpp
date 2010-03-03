@@ -23,6 +23,7 @@ void test_matrix1()
     m.add(2, 3, 1);
     m.print();
 
+    printf("----\n");
     CSRMatrix n(&m);
     n.print();
 }

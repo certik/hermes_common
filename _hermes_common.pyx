@@ -29,7 +29,7 @@ cdef class SparseMatrix(Matrix):
 
 cdef class CooMatrix(SparseMatrix):
 
-    def __cinit__(self, size=0):
+    def __init__(self, size=0):
         self.thisptr = <c_Matrix *>new_CooMatrix(size)
 
     @property
@@ -64,19 +64,9 @@ cdef class CooMatrix(SparseMatrix):
     def __str__(self):
         return str(self.to_scipy_coo())
 
-# XXX: make this more general:
-cdef CooMatrix _C(M):
-    return M
-
-cdef api object c2py_CooMatrix(c_CooMatrix *m):
-    cdef CooMatrix c
-    c = <CooMatrix>PY_NEW(CooMatrix)
-    c.thisptr = <c_Matrix *>m
-    return c
-
 cdef class CSRMatrix(SparseMatrix):
 
-    def __cinit__(self, M):
+    def __init__(self, M):
         if isinstance(M, (int, long)):
             size = M
             self.thisptr = <c_Matrix *>new_CSRMatrix_size(size)
@@ -121,6 +111,21 @@ cdef class CSRMatrix(SparseMatrix):
     def __str__(self):
         return str(self.to_scipy_csr())
 
+# XXX: make this more general:
+cdef CooMatrix _C(M):
+    return M
+
+cdef api object c2py_CooMatrix(c_CooMatrix *m):
+    cdef CooMatrix c
+    c = <CooMatrix>PY_NEW(CooMatrix)
+    c.thisptr = <c_Matrix *>m
+    return c
+
+cdef api object c2py_CSRMatrix(c_CSRMatrix *m):
+    cdef CSRMatrix c
+    c = <CSRMatrix>PY_NEW(CSRMatrix)
+    c.thisptr = <c_Matrix *>m
+    return c
 
 #-----------------------------------------------------------------------
 # Common C++ <-> Python+NumPy conversion tools:
@@ -193,6 +198,9 @@ cdef api object c2py_int(int i):
 
 cdef api int py2c_int(object i):
     return i
+
+cdef api char* py2c_str(object s):
+    return s
 
 cdef api double py2c_double(object i):
     return i
