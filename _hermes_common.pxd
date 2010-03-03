@@ -78,3 +78,6 @@ cdef extern from "stdcython.h":
     void delete(...)
 
     void throw_exception(char *msg)
+
+cdef struct c_Matrix "Matrix":
+    int get_size()

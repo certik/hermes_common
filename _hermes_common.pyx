@@ -13,6 +13,16 @@ cdef inline char_p str2cp(object s) except ? NULL:
 
 
 #-----------------------------------------------------------------------
+# Matrix classes:
+
+cdef class Matrix:
+    cdef c_Matrix *thisptr
+
+    def get_size(self):
+        return self.thisptr.get_size()
+
+
+#-----------------------------------------------------------------------
 # Common C++ <-> Python+NumPy conversion tools:
 
 import sys
