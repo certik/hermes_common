@@ -8,5 +8,6 @@
 
 void solve_linear_system_numpy(CooMatrix *mat, double *res);
 void solve_linear_system_scipy_umfpack(CooMatrix *mat, double *res);
+void solve_linear_system_scipy_cg(CooMatrix *mat, double *res);
 
 #endif
