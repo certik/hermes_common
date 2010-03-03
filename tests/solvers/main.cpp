@@ -3,7 +3,7 @@
 
 #include "matrix.h"
 
-#include "_hermes_common_api.h"
+#include "Python.h"
 
 #define ERROR_SUCCESS                               0
 #define ERROR_FAILURE                              -1
@@ -35,8 +35,6 @@ int main(int argc, char* argv[])
         putenv((char *)"PYTHONPATH=../..");
         Py_Initialize();
         PySys_SetArgv(argc, argv);
-        if (import__hermes_common())
-            throw std::runtime_error("hermes_common failed to import.");
 
         test_matrix1();
 
