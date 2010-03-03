@@ -5,6 +5,8 @@
 
 #include "matrix.h"
 
+#include "_hermes_common_api.h"
+
 #define TINY 1e-20
 
 
@@ -90,6 +92,18 @@ void choldc(double **a, int n, double p[])
         a[j][i] = sum / p[i];
     }
   }
+}
+
+CSRMatrix::CSRMatrix(CooMatrix *m) {
+    // this is necessary, so that we can use Python from matrix.cpp:
+    if (import__hermes_common())
+        throw std::runtime_error("hermes_common failed to import.");
+    insert_object("m", c2py_CooMatrix(m));
+    cmd("print 'heja'");
+    cmd("print m");
+    DenseMatrix *dmat = new DenseMatrix(m);
+    this->add_from_dense_matrix(dmat);
+    delete dmat;
 }
 
 void solve_linear_system_dense(DenseMatrix *mat, double *res)

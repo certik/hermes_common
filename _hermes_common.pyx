@@ -67,6 +67,12 @@ cdef class CooMatrix(SparseMatrix):
 cdef CooMatrix _C(M):
     return M
 
+cdef api object c2py_CooMatrix(c_CooMatrix *m):
+    cdef CooMatrix c
+    c = <CooMatrix>PY_NEW(CooMatrix)
+    c.thisptr = <c_Matrix *>m
+    return c
+
 cdef class CSRMatrix(SparseMatrix):
 
     def __cinit__(self, M):
@@ -288,3 +294,8 @@ cdef api object run_cmd(const_char_p text, object namespace):
         s = "".join(traceback.format_exception(etype, value, tb))
         s = "Exception raised in the Python code:\n" + s
         throw_exception(s)
+
+def init_hermes2d_wrappers():
+    init_global_empty_tuple()
+
+init_global_empty_tuple()

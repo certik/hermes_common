@@ -377,11 +377,7 @@ class CSRMatrix : public Matrix {
             this->IA = NULL;
             this->JA = NULL;
         }
-        CSRMatrix(CooMatrix *m) {
-            DenseMatrix *dmat = new DenseMatrix(m);
-            this->add_from_dense_matrix(dmat);
-            delete dmat;
-        }
+        CSRMatrix(CooMatrix *m);
         CSRMatrix(DenseMatrix *m) {
             this->add_from_dense_matrix(m);
         }
