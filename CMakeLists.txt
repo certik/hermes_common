@@ -36,6 +36,13 @@ set(SRC
     )
 
 add_library(${HERMES_COMMON} SHARED ${SRC})
+set_source_files_properties(matrix.cpp PROPERTIES
+    OBJECT_DEPENDS _hermes_common_api.h
+    )
+add_custom_command(
+    OUTPUT _hermes_common_api.h
+    COMMAND cython _hermes_common.pyx
+    )
 
 cython_add_module(_hermes_common stdcython.cpp)
 target_link_libraries(_hermes_common ${HERMES_COMMON})
