@@ -78,6 +78,11 @@ cdef extern from "stdcython.h":
 
     void throw_exception(char *msg)
 
+cdef extern from "matrix.h":
 
-cdef struct c_Matrix "Matrix":
-    int get_size()
+    cdef struct c_Matrix "Matrix":
+        int get_size()
+
+    cdef struct c_CooMatrix "CooMatrix":
+        int get_size()
+    c_CooMatrix *new_CooMatrix "new CooMatrix" (int size)

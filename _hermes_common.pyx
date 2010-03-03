@@ -21,6 +21,11 @@ cdef class Matrix:
     def get_size(self):
         return self.thisptr.get_size()
 
+cdef class CooMatrix(Matrix):
+
+    def __cinit__(self, size=0):
+        self.thisptr = <c_Matrix *>new_CooMatrix(size)
+
 
 #-----------------------------------------------------------------------
 # Common C++ <-> Python+NumPy conversion tools:
