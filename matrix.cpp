@@ -94,10 +94,20 @@ void choldc(double **a, int n, double p[])
   }
 }
 
-CSRMatrix::CSRMatrix(CooMatrix *m) {
-    // this is necessary, so that we can use Python from matrix.cpp:
-    if (import__hermes_common())
-        throw std::runtime_error("hermes_common failed to import.");
+int initialized=0;
+
+Matrix::Matrix()
+{
+    if (!initialized) {
+        // this is necessary, so that we can use Python from matrix.cpp:
+        if (import__hermes_common())
+            throw std::runtime_error("hermes_common failed to import.");
+        initialized=1;
+    }
+}
+
+CSRMatrix::CSRMatrix(CooMatrix *m):Matrix()
+{
     insert_object("m", c2py_CooMatrix(m));
     cmd("n = m.to_scipy_coo().tocsr()");
     cmd("A = n.data");
@@ -115,16 +125,15 @@ CSRMatrix::CSRMatrix(CooMatrix *m) {
     //delete dmat;
 }
 
-void CSRMatrix::print() {
+void CSRMatrix::print()
+{
     insert_object("m", c2py_CSRMatrix(this));
     cmd("S = str(m.to_scipy_csr())");
     printf("%s\n", py2c_str(get_object("S")));
 }
 
-void CooMatrix::print() {
-    // this is necessary, so that we can use Python from matrix.cpp:
-    if (import__hermes_common())
-        throw std::runtime_error("hermes_common failed to import.");
+void CooMatrix::print()
+{
     insert_object("m", c2py_CooMatrix(this));
     cmd("S = str(m.to_scipy_coo())");
     printf("%s\n", py2c_str(get_object("S")));

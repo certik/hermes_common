@@ -140,6 +140,7 @@ void cholsl(double **a, int n, double p[], T b[], T x[])
 
 class Matrix {
 public:
+    Matrix();
     virtual ~Matrix() { }
     virtual int get_size() = 0;
     virtual void add(int m, int n, double v) = 0;
@@ -167,12 +168,12 @@ class Triple {
 
 class CooMatrix : public Matrix {
     public:
-        CooMatrix() {
+        CooMatrix():Matrix() {
             this->size = 0;
             this->list = NULL;
             this->list_last = NULL;
         }
-        CooMatrix(int size) {
+        CooMatrix(int size):Matrix() {
             this->size = size;
             this->list = NULL;
             this->list_last = NULL;
@@ -365,14 +366,14 @@ class DenseMatrix : public Matrix {
 
 class CSRMatrix : public Matrix {
     public:
-        CSRMatrix(int size) {
+        CSRMatrix(int size):Matrix() {
             this->size = size;
             this->A = NULL;
             this->IA = NULL;
             this->JA = NULL;
         }
         CSRMatrix(CooMatrix *m);
-        CSRMatrix(DenseMatrix *m) {
+        CSRMatrix(DenseMatrix *m):Matrix() {
             this->add_from_dense_matrix(m);
         }
         ~CSRMatrix() {
