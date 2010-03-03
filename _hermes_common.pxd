@@ -82,7 +82,9 @@ cdef extern from "matrix.h":
 
     cdef struct c_Matrix "Matrix":
         int get_size()
+        void add(int m, int n, double v)
 
     cdef struct c_CooMatrix "CooMatrix":
-        int get_size()
+        int triplets_len()
+        void get_row_col_data(int *row, int *col, double *data)
     c_CooMatrix *new_CooMatrix "new CooMatrix" (int size)

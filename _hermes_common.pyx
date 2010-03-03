@@ -21,10 +21,47 @@ cdef class Matrix:
     def get_size(self):
         return self.thisptr.get_size()
 
-cdef class CooMatrix(Matrix):
+    def add(self, int m, int n, double v):
+        self.thisptr.add(m, n, v)
+
+cdef class SparseMatrix(Matrix):
+
+    def __str__(self):
+        return "ok"
+
+cdef class CooMatrix(SparseMatrix):
 
     def __cinit__(self, size=0):
         self.thisptr = <c_Matrix *>new_CooMatrix(size)
+
+    @property
+    def row_col_data(self):
+        """
+        Returns (row, col, data) arrays.
+        """
+        from numpy import empty
+        cdef c_CooMatrix *_thisptr = <c_CooMatrix*>(self.thisptr)
+        cdef int n, len
+        cdef int *crow, *ccol
+        cdef double *cdata
+        len = _thisptr.triplets_len()
+        row = empty([len], dtype="int32")
+        numpy2c_int_inplace(row, &crow, &n)
+        col = empty([len], dtype="int32")
+        numpy2c_int_inplace(col, &ccol, &n)
+        data = empty([len], dtype="double")
+        numpy2c_double_inplace(data, &cdata, &n)
+        _thisptr.get_row_col_data(crow, ccol, cdata)
+        return row, col, data
+
+    def to_scipy_coo(self):
+        """
+        Converts itself to the scipy sparse COO format.
+        """
+        from scipy.sparse import coo_matrix
+        row, col, data = self.row_col_data
+        n = self.get_size()
+        return coo_matrix((data, (row, col)), shape=(n, n))
 
 
 #-----------------------------------------------------------------------

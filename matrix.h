@@ -184,12 +184,12 @@ class CooMatrix : public Matrix {
             this->size = 0;
         }
         void free_data() {
-	  Triple *t = this->list;
-          while (t != NULL) {
-            Triple *t_old = t;
-            t = t->next;
-            delete t_old;
-          }
+            Triple *t = this->list;
+            while (t != NULL) {
+                Triple *t_old = t;
+                t = t->next;
+                delete t_old;
+            }
         }
         virtual void set_zero() {
             this->free_data();
@@ -197,21 +197,21 @@ class CooMatrix : public Matrix {
             this->list_last = NULL;
         }
         virtual void add(int m, int n, double v) {
-          // adjusting size if necessary
-          if (m+1 > this->size) this->size = m+1;
-          if (n+1 > this->size) this->size = n+1;
-          // debug
-          if (DEBUG_MATRIX) {
-  	    printf("Matrix_add %d %d %g -> size = %d\n", m, n, v, this->size);
-          }
-          Triple *t = new Triple(m, n, v);
-          if (this->list == NULL) {
-              this->list = t;
-              this->list_last = t;
-          } else {
-              this->list_last->next = t;
-              this->list_last = this->list_last->next;
-          }
+            // adjusting size if necessary
+            if (m+1 > this->size) this->size = m+1;
+            if (n+1 > this->size) this->size = n+1;
+            // debug
+            if (DEBUG_MATRIX) {
+                printf("Matrix_add %d %d %g -> size = %d\n", m, n, v, this->size);
+            }
+            Triple *t = new Triple(m, n, v);
+            if (this->list == NULL) {
+                this->list = t;
+                this->list_last = t;
+            } else {
+                this->list_last->next = t;
+                this->list_last = this->list_last->next;
+            }
         }
         virtual void copy_into(Matrix *m) {
             m->set_zero();
@@ -221,6 +221,32 @@ class CooMatrix : public Matrix {
                 t = t->next;
             }
         }
+
+        // Returns the number of triplets
+        int triplets_len() {
+            Triple *t = this->list;
+            int len = 0;
+            while (t != NULL) {
+                len++;
+                t = t->next;
+            }
+            return len;
+        }
+
+        // Returns the row/col indices, together with the data. All row, col
+        // and data arrays have to be initialized (use this->triplets_len).
+        void get_row_col_data(int *row, int *col, double *data) {
+            Triple *t = this->list;
+            int i = 0;
+            while (t != NULL) {
+                row[i] = t->i;
+                col[i] = t->j;
+                data[i] = t->v;
+                i++;
+                t = t->next;
+            }
+        }
+
         virtual double get(int m, int n) {
             double v=0;
             Triple *t = this->list;
@@ -247,7 +273,7 @@ class CooMatrix : public Matrix {
         }
 
         virtual void times_vector(double* vec, double* result, int rank) {
-	    for (int i=0; i < rank; i++) result[i] = 0;
+            for (int i=0; i < rank; i++) result[i] = 0;
             Triple *t = this->list;
             while (t != NULL) {
                 result[t->i] += t->v * vec[t->j];
@@ -274,7 +300,6 @@ class DenseMatrix : public Matrix {
             this->size = size;
             for (int i = 0; i<size; i++)
               for (int j = 0; j<size; j++) this->mat[i][j] = 0;
-              
         }
         DenseMatrix(Matrix *m) {
             this->mat = new_matrix<double>(m->get_size(), m->get_size());
