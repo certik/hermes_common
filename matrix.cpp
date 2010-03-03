@@ -99,11 +99,20 @@ CSRMatrix::CSRMatrix(CooMatrix *m) {
     if (import__hermes_common())
         throw std::runtime_error("hermes_common failed to import.");
     insert_object("m", c2py_CooMatrix(m));
-    cmd("print 'heja'");
-    cmd("print m");
-    DenseMatrix *dmat = new DenseMatrix(m);
-    this->add_from_dense_matrix(dmat);
-    delete dmat;
+    cmd("n = m.to_scipy_coo().tocsr()");
+    cmd("A = n.data");
+    cmd("IA = n.indptr");
+    cmd("JA = n.indices");
+    //XXX: this should *not* be inplace, we need to fix it.
+    numpy2c_double_inplace(get_object("A"), &(this->A), &(this->nnz));
+    numpy2c_int_inplace(get_object("IA"), &(this->IA), &(this->size));
+    numpy2c_int_inplace(get_object("JA"), &(this->JA), &(this->nnz));
+    this->size--;
+
+    // Original C++ implementation using a DenseMatrix:
+    //DenseMatrix *dmat = new DenseMatrix(m);
+    //this->add_from_dense_matrix(dmat);
+    //delete dmat;
 }
 
 void solve_linear_system_dense(DenseMatrix *mat, double *res)
