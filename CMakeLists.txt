@@ -30,7 +30,6 @@ set(HERMES_COMMON hermes_common)
 
 
 set(SRC
-    common.cpp
     matrix.cpp
     python_solvers.cpp
     )

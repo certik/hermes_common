@@ -8,13 +8,16 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <stdexcept>
 #include <iostream>
 #include <fstream>
 #include <typeinfo>
 #include <math.h>
 #include <string.h>
 
-#include "common.h"
+// printf debug information about the stiffness/Jacobi matrix
+#define error(x) throw std::runtime_error(x)
+#define DEBUG_MATRIX 0
 
 class Matrix {
 public:
