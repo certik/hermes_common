@@ -22,6 +22,12 @@ public:
     virtual ~Matrix() { }
     virtual int get_size() = 0;
     virtual void add(int m, int n, double v) = 0;
+    virtual void add_block(int *iidx, int ilen, int *jidx, int jlen,
+            double** mat) {
+        for (int i = 0; i < ilen; i++)
+            for (int j=0; j < jlen; j++)
+                this->add(iidx[i], jidx[j], mat[i][j]);
+    }
     virtual void set_zero() = 0;
     virtual double get(int m, int n) = 0;
     virtual void copy_into(Matrix *m) = 0;
