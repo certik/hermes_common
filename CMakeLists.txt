@@ -25,7 +25,6 @@ add_custom_target(test
 #PYTHONPATH=${hermes_common_SOURCE_DIR}
 set(HERMES_COMMON hermes_common)
 
-add_subdirectory(tests)
 
 
 
@@ -44,6 +43,7 @@ add_custom_command(
     OUTPUT _hermes_common_api.h
     COMMAND cython _hermes_common.pyx
     )
+add_subdirectory(tests)
 
 cython_add_module(_hermes_common stdcython.cpp)
 target_link_libraries(_hermes_common ${HERMES_COMMON})
