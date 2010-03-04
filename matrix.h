@@ -16,7 +16,7 @@
 #include <string.h>
 
 // printf debug information about the stiffness/Jacobi matrix
-#define error(x) throw std::runtime_error(x)
+#define _error(x) throw std::runtime_error(x)
 #define DEBUG_MATRIX 0
 
 class Matrix {
@@ -184,7 +184,7 @@ T** new_matrix(int m, int n = 0)
 {
   if (!n) n = m;
   T** vec = (T**) new char[sizeof(T*)*m + sizeof(T)*m*n];
-  if (vec == NULL) error("Out of memory.");
+  if (vec == NULL) _error("Out of memory.");
   T* row = (T*) (vec + m);
   for (int i = 0; i < m; i++, row += n)
     vec[i] = row;
@@ -253,7 +253,7 @@ class DenseMatrix : public Matrix {
         }
 
         virtual void times_vector(double* vec, double* result, int rank) {
-	    error("times_vector() in dense matrix not implemented yet.");
+	    _error("times_vector() in dense matrix not implemented yet.");
         }
 
         // Return the internal matrix.
@@ -313,13 +313,13 @@ class CSRMatrix : public Matrix {
         }
 
         virtual void add(int m, int n, double v) {
-            error("CSR matrix add() not implemented.");
+            _error("CSR matrix add() not implemented.");
         }
         virtual void set_zero() {
-            error("CSR matrix set_zero() not implemented.");
+            _error("CSR matrix set_zero() not implemented.");
         }
         virtual double get(int m, int n) {
-            error("CSR matrix get() not implemented.");
+            _error("CSR matrix get() not implemented.");
         }
 
         virtual int get_size() {
@@ -329,13 +329,13 @@ class CSRMatrix : public Matrix {
             return this->nnz;
         }
         virtual void copy_into(Matrix *m) {
-            error("CSR matrix copy_into() not implemented.");
+            _error("CSR matrix copy_into() not implemented.");
         }
 
         virtual void print();
 
         virtual void times_vector(double* vec, double* result, int rank) {
-	    error("times_vector() in CSR matrix not implemented yet.");
+	    _error("times_vector() in CSR matrix not implemented yet.");
         }
 
         int *get_IA() {

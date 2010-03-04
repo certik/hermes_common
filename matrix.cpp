@@ -129,7 +129,7 @@ void ludcmp(double** a, int n, int* indx, double* d)
     for (j = 0; j < n; j++) 
       if ((temp = fabs(a[i][j])) > big) 
         big = temp;
-    if (big == 0.0) error("Singular matrix!");
+    if (big == 0.0) _error("Singular matrix!");
     vv[i] = 1.0 / big;
   }
   for (j = 0; j < n; j++)
@@ -190,7 +190,7 @@ void choldc(double **a, int n, double p[])
       if (i == j)
       {
         if (sum <= 0.0)
-          error("CHOLDC failed!");
+          _error("CHOLDC failed!");
         else
           p[i] = sqrt(sum);
       }
