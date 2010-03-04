@@ -180,7 +180,7 @@ class CooMatrix : public Matrix {
 /// The entries can be accessed by matrix[i][j]. To delete the matrix, just
 /// do "delete matrix".
 template<typename T>
-T** new_matrix(int m, int n = 0)
+T** _new_matrix(int m, int n = 0)
 {
   if (!n) n = m;
   T** vec = (T**) new char[sizeof(T*)*m + sizeof(T)*m*n];
@@ -194,13 +194,13 @@ T** new_matrix(int m, int n = 0)
 class DenseMatrix : public Matrix {
     public:
         DenseMatrix(int size) {
-            this->mat = new_matrix<double>(size, size);
+            this->mat = _new_matrix<double>(size, size);
             this->size = size;
             for (int i = 0; i<size; i++)
               for (int j = 0; j<size; j++) this->mat[i][j] = 0;
         }
         DenseMatrix(Matrix *m) {
-            this->mat = new_matrix<double>(m->get_size(), m->get_size());
+            this->mat = _new_matrix<double>(m->get_size(), m->get_size());
             //printf("%d %d", this->size, m->get_size());
             //exit(1);
             this->size = m->get_size();
