@@ -17,11 +17,6 @@ include_directories(${PYTHON_INCLUDE_PATH} ${NUMPY_INCLUDE_PATH})
 
 enable_testing()
 
-# this is done by cmake anyway, no matter what actual COMMAND we put here (!):
-add_custom_target(test
-    COMMAND ctest
-)
-
 #PYTHONPATH=${hermes_common_SOURCE_DIR}
 set(HERMES_COMMON hermes_common)
 
