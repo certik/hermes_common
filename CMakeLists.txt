@@ -31,7 +31,7 @@ set(SRC
 
 add_library(${HERMES_COMMON} SHARED ${SRC})
 set_source_files_properties(matrix.cpp PROPERTIES
-    OBJECT_DEPENDS _hermes_common_api.h
+    OBJECT_DEPENDS ${hermes_common_SOURCE_DIR}/_hermes_common_api.h
     )
 add_custom_command(
     OUTPUT _hermes_common_api.h
