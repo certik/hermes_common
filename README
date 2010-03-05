@@ -14,4 +14,10 @@ $ make
 Tests
 -----
 
+C++ tests:
+
 $ make test
+
+Python tests:
+
+$ py.test
