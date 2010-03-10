@@ -21,3 +21,10 @@ $ make test
 Python tests:
 
 $ py.test
+
+Documentation
+-------------
+
+Read the tests in tests/*/main.cpp for lots of C++ examples.
+
+Read the tests in tests/test_* for lots of Python examples.
