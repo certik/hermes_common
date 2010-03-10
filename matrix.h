@@ -29,7 +29,8 @@ public:
             double** mat) {
         for (int i = 0; i < ilen; i++)
             for (int j=0; j < jlen; j++)
-                this->add(iidx[i], jidx[j], mat[i][j]);
+                if (iidx[i] >= 0 && jidx[j] >= 0)
+                    this->add(iidx[i], jidx[j], mat[i][j]);
     }
     virtual void set_zero() = 0;
     virtual double get(int m, int n) = 0;
