@@ -111,6 +111,53 @@ cdef class CSRMatrix(SparseMatrix):
     def __str__(self):
         return str(self.to_scipy_csr())
 
+cdef class CSCMatrix(SparseMatrix):
+
+    def __init__(self, M):
+        if isinstance(M, (int, long)):
+            size = M
+            self.thisptr = <c_Matrix *>new_CSCMatrix_size(size)
+        elif isinstance(M, CooMatrix):
+            self.thisptr = <c_Matrix *>new_CSCMatrix_coo_matrix(
+                    <c_CooMatrix*>(_C(M).thisptr))
+        else:
+            raise Exception("Not implemented.")
+
+    @property
+    def IA(self):
+        """
+        Returns (row, col, data) arrays.
+        """
+        cdef c_CSCMatrix *_thisptr = <c_CSCMatrix*>(self.thisptr)
+        return c2numpy_int_inplace(_thisptr.get_IA(), _thisptr.get_nnz())
+
+    @property
+    def JA(self):
+        """
+        Returns (row, col, data) arrays.
+        """
+        cdef c_CSCMatrix *_thisptr = <c_CSCMatrix*>(self.thisptr)
+        return c2numpy_int_inplace(_thisptr.get_JA(), self.get_size()+1)
+
+    @property
+    def A(self):
+        """
+        Returns (row, col, data) arrays.
+        """
+        cdef c_CSCMatrix *_thisptr = <c_CSCMatrix*>(self.thisptr)
+        return c2numpy_double_inplace(_thisptr.get_A(), _thisptr.get_nnz())
+
+    def to_scipy_csc(self):
+        """
+        Converts itself to the scipy sparse CSC format.
+        """
+        from scipy.sparse import csc_matrix
+        n = self.get_size()
+        return csc_matrix((self.A, self.IA, self.JA), shape=(n, n))
+
+    def __str__(self):
+        return str(self.to_scipy_csc())
+
 # XXX: make this more general:
 cdef CooMatrix _C(M):
     return M
@@ -124,6 +171,12 @@ cdef api object c2py_CooMatrix(c_CooMatrix *m):
 cdef api object c2py_CSRMatrix(c_CSRMatrix *m):
     cdef CSRMatrix c
     c = <CSRMatrix>PY_NEW(CSRMatrix)
+    c.thisptr = <c_Matrix *>m
+    return c
+
+cdef api object c2py_CSCMatrix(c_CSCMatrix *m):
+    cdef CSCMatrix c
+    c = <CSCMatrix>PY_NEW(CSCMatrix)
     c.thisptr = <c_Matrix *>m
     return c
 

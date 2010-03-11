@@ -238,6 +238,27 @@ void CSRMatrix::print()
     printf("%s\n", py2c_str(get_object("S")));
 }
 
+CSCMatrix::CSCMatrix(CooMatrix *m):Matrix()
+{
+    insert_object("m", c2py_CooMatrix(m));
+    cmd("n = m.to_scipy_coo().tocsc()");
+    cmd("A = n.data");
+    cmd("IA = n.indices");
+    cmd("JA = n.indptr");
+    //XXX: this should *not* be inplace, we need to fix it.
+    numpy2c_double_inplace(get_object("A"), &(this->A), &(this->nnz));
+    numpy2c_int_inplace(get_object("IA"), &(this->IA), &(this->nnz));
+    numpy2c_int_inplace(get_object("JA"), &(this->JA), &(this->size));
+    this->size--;
+}
+
+void CSCMatrix::print()
+{
+    insert_object("m", c2py_CSCMatrix(this));
+    cmd("S = str(m.to_scipy_csc())");
+    printf("%s\n", py2c_str(get_object("S")));
+}
+
 void CooMatrix::print()
 {
     insert_object("m", c2py_CooMatrix(this));

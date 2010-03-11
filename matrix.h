@@ -358,6 +358,66 @@ class CSRMatrix : public Matrix {
 
 };
 
+class CSCMatrix : public Matrix {
+    public:
+        CSCMatrix(int size):Matrix() {
+            this->size = size;
+            this->A = NULL;
+            this->IA = NULL;
+            this->JA = NULL;
+        }
+        CSCMatrix(CooMatrix *m);
+        ~CSCMatrix() {
+            delete[] this->A;
+            delete[] this->IA;
+            delete[] this->JA;
+        }
+
+        virtual void add(int m, int n, double v) {
+            _error("CSC matrix add() not implemented.");
+        }
+        virtual void set_zero() {
+            _error("CSC matrix set_zero() not implemented.");
+        }
+        virtual double get(int m, int n) {
+            _error("CSC matrix get() not implemented.");
+        }
+
+        virtual int get_size() {
+            return this->size;
+        }
+        int get_nnz() {
+            return this->nnz;
+        }
+        virtual void copy_into(Matrix *m) {
+            _error("CSC matrix copy_into() not implemented.");
+        }
+
+        virtual void print();
+
+        virtual void times_vector(double* vec, double* result, int rank) {
+	    _error("times_vector() in CSC matrix not implemented yet.");
+        }
+
+        int *get_IA() {
+            return this->IA;
+        }
+        int *get_JA() {
+            return this->JA;
+        }
+        double *get_A() {
+            return this->A;
+        }
+
+    private:
+        int size;
+        int nnz;
+        double *A;
+        int *IA;
+        int *JA;
+
+};
+
 // solve linear system
 void solve_linear_system(Matrix *mat, double *res);
 void solve_linear_system_dense(DenseMatrix *mat, double *res);

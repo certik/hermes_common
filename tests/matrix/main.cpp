@@ -24,8 +24,10 @@ void test_matrix1()
     m.print();
 
     printf("----\n");
-    CSRMatrix n(&m);
-    n.print();
+    CSRMatrix n1(&m);
+    n1.print();
+    CSCMatrix n2(&m);
+    n2.print();
 }
 
 int main(int argc, char* argv[])

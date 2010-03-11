@@ -97,3 +97,12 @@ cdef extern from "matrix.h":
         int get_nnz()
     c_CSRMatrix *new_CSRMatrix_size "new CSRMatrix" (int size)
     c_CSRMatrix *new_CSRMatrix_coo_matrix "new CSRMatrix" (c_CooMatrix *m)
+
+    cdef struct c_CSCMatrix "CSCMatrix":
+        CSCMatrix(int size)
+        int *get_IA()
+        int *get_JA()
+        double *get_A()
+        int get_nnz()
+    c_CSCMatrix *new_CSCMatrix_size "new CSCMatrix" (int size)
+    c_CSCMatrix *new_CSCMatrix_coo_matrix "new CSCMatrix" (c_CooMatrix *m)
