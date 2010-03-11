@@ -89,6 +89,8 @@ cdef extern from "matrix.h":
         void get_row_col_data(int *row, int *col, double *data)
     c_CooMatrix *new_CooMatrix "new CooMatrix" (int size)
 
+    cdef struct c_CSCMatrix "CSCMatrix"
+
     cdef struct c_CSRMatrix "CSRMatrix":
         CSRMatrix(int size)
         int *get_IA()
@@ -97,6 +99,7 @@ cdef extern from "matrix.h":
         int get_nnz()
     c_CSRMatrix *new_CSRMatrix_size "new CSRMatrix" (int size)
     c_CSRMatrix *new_CSRMatrix_coo_matrix "new CSRMatrix" (c_CooMatrix *m)
+    c_CSRMatrix *new_CSRMatrix_csc_matrix "new CSRMatrix" (c_CSCMatrix *m)
 
     cdef struct c_CSCMatrix "CSCMatrix":
         CSCMatrix(int size)
@@ -106,3 +109,4 @@ cdef extern from "matrix.h":
         int get_nnz()
     c_CSCMatrix *new_CSCMatrix_size "new CSCMatrix" (int size)
     c_CSCMatrix *new_CSCMatrix_coo_matrix "new CSCMatrix" (c_CooMatrix *m)
+    c_CSCMatrix *new_CSCMatrix_csr_matrix "new CSCMatrix" (c_CSRMatrix *m)

@@ -73,6 +73,9 @@ cdef class CSRMatrix(SparseMatrix):
         elif isinstance(M, CooMatrix):
             self.thisptr = <c_Matrix *>new_CSRMatrix_coo_matrix(
                     <c_CooMatrix*>(_C(M).thisptr))
+        elif isinstance(M, CSCMatrix):
+            self.thisptr = <c_Matrix *>new_CSRMatrix_csc_matrix(
+                    <c_CSCMatrix*>(_C2(M).thisptr))
         else:
             raise Exception("Not implemented.")
 
@@ -120,6 +123,9 @@ cdef class CSCMatrix(SparseMatrix):
         elif isinstance(M, CooMatrix):
             self.thisptr = <c_Matrix *>new_CSCMatrix_coo_matrix(
                     <c_CooMatrix*>(_C(M).thisptr))
+        elif isinstance(M, CSRMatrix):
+            self.thisptr = <c_Matrix *>new_CSCMatrix_csr_matrix(
+                    <c_CSRMatrix*>(_C3(M).thisptr))
         else:
             raise Exception("Not implemented.")
 
@@ -160,6 +166,10 @@ cdef class CSCMatrix(SparseMatrix):
 
 # XXX: make this more general:
 cdef CooMatrix _C(M):
+    return M
+cdef CSCMatrix _C2(M):
+    return M
+cdef CSRMatrix _C3(M):
     return M
 
 cdef api object c2py_CooMatrix(c_CooMatrix *m):

@@ -268,6 +268,8 @@ class DenseMatrix : public Matrix {
 
 };
 
+class CSCMatrix;
+
 class CSRMatrix : public Matrix {
     public:
         CSRMatrix(int size):Matrix() {
@@ -277,6 +279,7 @@ class CSRMatrix : public Matrix {
             this->JA = NULL;
         }
         CSRMatrix(CooMatrix *m);
+        CSRMatrix(CSCMatrix *m);
         CSRMatrix(DenseMatrix *m):Matrix() {
             this->add_from_dense_matrix(m);
         }
@@ -367,6 +370,7 @@ class CSCMatrix : public Matrix {
             this->JA = NULL;
         }
         CSCMatrix(CooMatrix *m);
+        CSCMatrix(CSRMatrix *m);
         ~CSCMatrix() {
             delete[] this->A;
             delete[] this->IA;

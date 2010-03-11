@@ -52,10 +52,18 @@ def test_csr_csc_1():
         [0, 0, 0, 0, 1.5],
         [0, 0, 1.5, 0, 0],
         ])
+    # test conversion from COO
     n = CSRMatrix(m)
     d1 = n.to_scipy_csr().todense()
     assert (d1-d2 < eps).all()
     n = CSCMatrix(m)
+    d1 = n.to_scipy_csc().todense()
+    assert (d1-d2 < eps).all()
+    # test conversion CSC <-> CSR
+    n = CSRMatrix(n)
+    d1 = n.to_scipy_csr().todense()
+    assert (d1-d2 < eps).all()
+    n = CSCMatrix(n)
     d1 = n.to_scipy_csc().todense()
     assert (d1-d2 < eps).all()
 
@@ -73,9 +81,17 @@ def test_csr_csc_2():
         [0, 0, 0, 0, 1.5],
         [0, 0, 0, 0, 0],
         ])
+    # test conversion from COO
     n = CSRMatrix(m)
     d1 = n.to_scipy_csr().todense()
     assert (d1-d2 < eps).all()
     n = CSCMatrix(m)
+    d1 = n.to_scipy_csc().todense()
+    assert (d1-d2 < eps).all()
+    # test conversion CSC <-> CSR
+    n = CSRMatrix(n)
+    d1 = n.to_scipy_csr().todense()
+    assert (d1-d2 < eps).all()
+    n = CSCMatrix(n)
     d1 = n.to_scipy_csc().todense()
     assert (d1-d2 < eps).all()

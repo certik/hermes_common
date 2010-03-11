@@ -224,11 +224,20 @@ CSRMatrix::CSRMatrix(CooMatrix *m):Matrix()
     numpy2c_int_inplace(get_object("IA"), &(this->IA), &(this->size));
     numpy2c_int_inplace(get_object("JA"), &(this->JA), &(this->nnz));
     this->size--;
+}
 
-    // Original C++ implementation using a DenseMatrix:
-    //DenseMatrix *dmat = new DenseMatrix(m);
-    //this->add_from_dense_matrix(dmat);
-    //delete dmat;
+CSRMatrix::CSRMatrix(CSCMatrix *m):Matrix()
+{
+    insert_object("m", c2py_CSCMatrix(m));
+    cmd("n = m.to_scipy_csc().tocsr()");
+    cmd("A = n.data");
+    cmd("IA = n.indptr");
+    cmd("JA = n.indices");
+    //XXX: this should *not* be inplace, we need to fix it.
+    numpy2c_double_inplace(get_object("A"), &(this->A), &(this->nnz));
+    numpy2c_int_inplace(get_object("IA"), &(this->IA), &(this->size));
+    numpy2c_int_inplace(get_object("JA"), &(this->JA), &(this->nnz));
+    this->size--;
 }
 
 void CSRMatrix::print()
@@ -242,6 +251,20 @@ CSCMatrix::CSCMatrix(CooMatrix *m):Matrix()
 {
     insert_object("m", c2py_CooMatrix(m));
     cmd("n = m.to_scipy_coo().tocsc()");
+    cmd("A = n.data");
+    cmd("IA = n.indices");
+    cmd("JA = n.indptr");
+    //XXX: this should *not* be inplace, we need to fix it.
+    numpy2c_double_inplace(get_object("A"), &(this->A), &(this->nnz));
+    numpy2c_int_inplace(get_object("IA"), &(this->IA), &(this->nnz));
+    numpy2c_int_inplace(get_object("JA"), &(this->JA), &(this->size));
+    this->size--;
+}
+
+CSCMatrix::CSCMatrix(CSRMatrix *m):Matrix()
+{
+    insert_object("m", c2py_CSRMatrix(m));
+    cmd("n = m.to_scipy_csr().tocsc()");
     cmd("A = n.data");
     cmd("IA = n.indices");
     cmd("JA = n.indptr");

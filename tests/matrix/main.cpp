@@ -24,10 +24,16 @@ void test_matrix1()
     m.print();
 
     printf("----\n");
+    // convert from COO
     CSRMatrix n1(&m);
     n1.print();
     CSCMatrix n2(&m);
     n2.print();
+    // convert CSR <-> CSC
+    CSRMatrix n3(&n2);
+    n3.print();
+    CSCMatrix n4(&n1);
+    n4.print();
 }
 
 int main(int argc, char* argv[])
