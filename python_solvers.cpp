@@ -27,10 +27,10 @@ void solve_linear_system_scipy_umfpack(CooMatrix *mat, double *res)
 {
     if (import__hermes_common())
         throw std::runtime_error("hermes_common failed to import.");
-    CSRMatrix M(mat);
-    insert_object("m", c2py_CSRMatrix(&M));
+    CSCMatrix M(mat);
+    insert_object("m", c2py_CSCMatrix(&M));
     insert_object("rhs", c2numpy_double_inplace(res, mat->get_size()));
-    cmd("A = m.to_scipy_csr()");
+    cmd("A = m.to_scipy_csc()");
     cmd("from scipy.sparse.linalg import spsolve");
     cmd("x = spsolve(A, rhs)");
     double *x;
