@@ -54,3 +54,19 @@ void solve_linear_system_scipy_cg(CooMatrix *mat, double *res)
     numpy2c_double_inplace(get_object("x"), &x, &n);
     memcpy(res, x, n*sizeof(double));
 }
+
+void solve_linear_system_scipy_gmres(CooMatrix *mat, double *res)
+{
+    if (import__hermes_common())
+        throw std::runtime_error("hermes_common failed to import.");
+    CSRMatrix M(mat);
+    insert_object("m", c2py_CSRMatrix(&M));
+    insert_object("rhs", c2numpy_double_inplace(res, mat->get_size()));
+    cmd("A = m.to_scipy_csr()");
+    cmd("from scipy.sparse.linalg import gmres");
+    cmd("x, res = gmres(A, rhs)");
+    double *x;
+    int n;
+    numpy2c_double_inplace(get_object("x"), &x, &n);
+    memcpy(res, x, n*sizeof(double));
+}

@@ -133,15 +133,15 @@ void test_solver4()
     _assert(fabs(res[2] - 3.) < EPS);
     _assert(fabs(res[3] - 4.) < EPS);
     _assert(fabs(res[4] - 5.) < EPS);
+    */
 
     res = {8., 45., -3., 3., 19.};
-    solve_linear_system_scipy_cg(&A, res);
+    solve_linear_system_scipy_gmres(&A, res);
     _assert(fabs(res[0] - 1.) < EPS);
     _assert(fabs(res[1] - 2.) < EPS);
     _assert(fabs(res[2] - 3.) < EPS);
     _assert(fabs(res[3] - 4.) < EPS);
     _assert(fabs(res[4] - 5.) < EPS);
-    */
 }
 
 int main(int argc, char* argv[])
