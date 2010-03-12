@@ -27,6 +27,7 @@ set(HERMES_COMMON hermes_common)
 set(SRC
     matrix.cpp
     python_solvers.cpp
+    python_api.cpp
     )
 
 add_library(${HERMES_COMMON} SHARED ${SRC})
