@@ -6,7 +6,7 @@
 #ifndef __HERMES_COMMON_MATRIX_H
 #define __HERMES_COMMON_MATRIX_H
 
-#include "_hermes_common_api.h"
+#include "_hermes_common_api_new.h"
 
 class Python {
 public:

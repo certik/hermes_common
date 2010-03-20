@@ -5,7 +5,7 @@
 
 #include "matrix.h"
 
-#include "_hermes_common_api.h"
+#include "_hermes_common_api_new.h"
 
 void solve_linear_system_numpy(CooMatrix *mat, double *res)
 {

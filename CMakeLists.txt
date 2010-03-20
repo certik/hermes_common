@@ -25,7 +25,7 @@ set(HERMES_COMMON hermes_common)
 
 
 set(SRC
-    _hermes_common_api.cpp
+    _hermes_common_api_new.cpp
     matrix.cpp
     python_solvers.cpp
     python_api.cpp
@@ -34,7 +34,7 @@ set(SRC
 add_library(${HERMES_COMMON} SHARED ${SRC})
 target_link_libraries(${HERMES_COMMON} ${PYTHON_LIBRARIES})
 set_source_files_properties(matrix.cpp PROPERTIES
-    OBJECT_DEPENDS ${hermes_common_SOURCE_DIR}/_hermes_common_api.h
+    OBJECT_DEPENDS ${hermes_common_SOURCE_DIR}/_hermes_common_api_new.h
     )
 add_custom_command(
     OUTPUT _hermes_common_api.h
