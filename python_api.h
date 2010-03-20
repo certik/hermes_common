@@ -11,6 +11,7 @@
 class Python {
 public:
     Python();
+    Python(int argc, char* argv[]);
     ~Python();
     void eval(const char *text);
     void insert_object(const char *name, PyObject *o);

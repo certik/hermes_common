@@ -13,7 +13,7 @@ void _assert(bool a)
     if (!a) throw std::runtime_error("Assertion failed.");
 }
 
-void test_basic()
+void test_basic1()
 {
     python->insert_object("i", c2py_int(5));
     python->eval("i = i*2");
@@ -21,12 +21,23 @@ void test_basic()
     _assert(i == 10);
 }
 
+void test_basic2()
+{
+    Python *p = new Python();
+    p->insert_object("i", c2py_int(5));
+    p->eval("i = i*2");
+    int i = py2c_int(p->get_object("i"));
+    _assert(i == 10);
+    delete p;
+}
+
 int main(int argc, char* argv[])
 {
     try {
-        python = new Python();
+        python = new Python(argc, argv);
 
-        test_basic();
+        test_basic1();
+        test_basic2();
 
         delete python;
 
