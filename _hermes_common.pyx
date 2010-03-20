@@ -193,7 +193,10 @@ import traceback
 # this is important to be called here, otherwise we can't use the NumPy C/API:
 import_array()
 
-global_namespace = {"verbose": False}
+cdef api object create_new_namespace():
+    return {"verbose": False}
+
+global_namespace = create_new_namespace()
 
 cdef api void cmd(const_char_p text):
     """

@@ -5,6 +5,7 @@
 extern PyObject *(*c2py_CooMatrix)(struct CooMatrix *);
 extern PyObject *(*c2py_CSRMatrix)(struct CSRMatrix *);
 extern PyObject *(*c2py_CSCMatrix)(struct CSCMatrix *);
+extern PyObject *(*create_new_namespace)(void);
 extern void (*cmd)(const char*);
 extern void (*set_verbose_cmd)(int);
 extern void (*insert_object)(const char*, PyObject *);
