@@ -31,6 +31,23 @@ void test_basic2()
     delete p;
 }
 
+void test_basic3()
+{
+    Python *p1 = new Python();
+    p1->insert_object("i", c2py_int(5));
+    p1->eval("i = i*2");
+    int i = py2c_int(p1->get_object("i"));
+    _assert(i == 10);
+    delete p1;
+
+    Python *p2 = new Python();
+    p2->insert_object("i", c2py_int(5));
+    p2->eval("i = i*2");
+    i = py2c_int(p2->get_object("i"));
+    _assert(i == 10);
+    delete p2;
+}
+
 int main(int argc, char* argv[])
 {
     try {
@@ -38,6 +55,7 @@ int main(int argc, char* argv[])
 
         test_basic1();
         test_basic2();
+        test_basic3();
 
         delete python;
 

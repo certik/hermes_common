@@ -25,10 +25,16 @@ Python::Python(int argc, char* argv[])
 
 Python::~Python()
 {
+    // Don't finalize the interpreter, because for some reason,
+    // import__hermes_common() doesn't work when called again in the second
+    // interpreter (segfaults). So for now we just keep one interpreter and
+    // that's it.
+    /*
     python_count--;
     if (python_count == 0) {
         Py_Finalize();
     }
+    */
 }
 
 void Python::eval(const char *text)
