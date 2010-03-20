@@ -8,6 +8,18 @@
 
 #include "_hermes_common_api_new.h"
 
+/*
+   This is a nice C++ Python API and the only header file that you should
+   include in your code.
+
+   You have to create an instance of the Python() class first, which will
+   initialize the pointers to the conversion methods (like py2c_int, c2py_int,
+   ...), defined in _hermes_common_api_new.h. Once you instantiated one
+   Python() instance, then you don't have to worry about this at all. If you
+   call the c2py_int (and similar methods) without instantiating Python()
+   first, it will segfault (as they point to NULL).
+*/
+
 class Python {
 public:
     Python();
