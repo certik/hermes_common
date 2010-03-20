@@ -17,7 +17,7 @@ PyObject *(*c2numpy_double)(double *, int);
 PyObject *(*c2numpy_double_inplace)(double *, int);
 void (*numpy2c_int_inplace)(PyObject *, int **, int *);
 void (*numpy2c_double_inplace)(PyObject *, double **, int *);
-PyObject *(*run_cmd)(const char*, PyObject *);
+void (*run_cmd)(const char*, PyObject *);
 
 PyObject *__Pyx_ImportModule(const char *name) {
     PyObject *py_name = 0;
@@ -112,7 +112,7 @@ int import__hermes_common(void) {
   if (__Pyx_ImportFunction(module, "c2numpy_double_inplace", (void (**)(void))&c2numpy_double_inplace, "PyObject *(double *, int)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "numpy2c_int_inplace", (void (**)(void))&numpy2c_int_inplace, "void (PyObject *, int **, int *)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "numpy2c_double_inplace", (void (**)(void))&numpy2c_double_inplace, "void (PyObject *, double **, int *)") < 0) goto bad;
-  if (__Pyx_ImportFunction(module, "run_cmd", (void (**)(void))&run_cmd, "PyObject *(const char*, PyObject *)") < 0) goto bad;
+  if (__Pyx_ImportFunction(module, "run_cmd", (void (**)(void))&run_cmd, "void (const char*, PyObject *)") < 0) goto bad;
   Py_DECREF(module); module = 0;
   return 0;
   bad:

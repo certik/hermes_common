@@ -19,7 +19,7 @@ extern PyObject *(*c2numpy_double)(double *, int);
 extern PyObject *(*c2numpy_double_inplace)(double *, int);
 extern void (*numpy2c_int_inplace)(PyObject *, int **, int *);
 extern void (*numpy2c_double_inplace)(PyObject *, double **, int *);
-extern PyObject *(*run_cmd)(const char*, PyObject *);
+extern void (*run_cmd)(const char*, PyObject *);
 
 extern PyObject *__Pyx_ImportModule(const char *name);
 extern int __Pyx_ImportFunction(PyObject *module, const char *funcname, void (**f)(void), const char *sig);

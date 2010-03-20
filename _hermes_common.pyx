@@ -199,8 +199,7 @@ cdef api void cmd(const_char_p text):
     """
     Runs the command "text" in the Python namespace.
     """
-    n = run_cmd(text, global_namespace)
-    global_namespace.update(n)
+    run_cmd(text, global_namespace)
 
 cdef api void set_verbose_cmd(int verbose):
     global_namespace["verbose"] = verbose
@@ -339,7 +338,7 @@ cdef api void numpy2c_double_inplace(object A_n, double **A_c, int *n):
     n[0] = len(A)
     A_c[0] = <double *>(A.data)
 
-cdef api object run_cmd(const_char_p text, object namespace):
+cdef api void run_cmd(const_char_p text, object namespace):
     try:
         verbose = namespace.get("verbose")
         if verbose:
@@ -352,7 +351,6 @@ cdef api object run_cmd(const_char_p text, object namespace):
         if verbose:
             print "new namespace:"
             print namespace
-        return namespace
     except SystemExit, e:
         try:
             exit_code = int(e)
