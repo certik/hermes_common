@@ -3,8 +3,8 @@
 // file for the exact terms).
 // Email: hermes1d@googlegroups.com, home page: http://hpfem.org/
 
-#ifndef __HERMES_COMMON_MATRIX_H
-#define __HERMES_COMMON_MATRIX_H
+#ifndef __HERMES_COMMON_PYTHON_API_H
+#define __HERMES_COMMON_PYTHON_API_H
 
 #include "_hermes_common_api_new.h"
 

@@ -5,7 +5,7 @@
 
 #include "matrix.h"
 
-#include "_hermes_common_api_new.h"
+#include "python_api.h"
 
 #define TINY 1e-20
 

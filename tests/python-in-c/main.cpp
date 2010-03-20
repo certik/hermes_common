@@ -1,7 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "_hermes_common_api_new.h"
+#include "python_api.h"
 
 #define ERROR_SUCCESS                               0
 #define ERROR_FAILURE                              -1
