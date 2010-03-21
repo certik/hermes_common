@@ -11,25 +11,27 @@ void _assert(bool a)
     if (!a) throw std::runtime_error("Assertion failed.");
 }
 
+Python *p;
+
 void test_basic()
 {
-    insert_object("i", c2py_int(5));
-    cmd("i = i*2");
-    int i = py2c_int(get_object("i"));
+    p->push("i", c2py_int(5));
+    p->exec("i = i*2");
+    int i = py2c_int(p->pull("i"));
     _assert(i == 10);
 }
 
 void test_numpy()
 {
     // double arrays
-    cmd("from numpy import array");
-    cmd("a = array(range(20), dtype='double')");
-    cmd("assert a.strides == (8,)");
-    cmd("b = a[::5]");
-    cmd("assert b.strides == (40,)");
+    p->exec("from numpy import array");
+    p->exec("a = array(range(20), dtype='double')");
+    p->exec("assert a.strides == (8,)");
+    p->exec("b = a[::5]");
+    p->exec("assert b.strides == (40,)");
     double *A;
     int n;
-    numpy2c_double_inplace(get_object("a"), &A, &n);
+    numpy2c_double_inplace(p->pull("a"), &A, &n);
     _assert(n == 20);
     _assert(
             (fabs(A[0] - 0.)  < 1e-10) &&
@@ -37,7 +39,7 @@ void test_numpy()
             (fabs(A[2] - 2.) < 1e-10) &&
             (fabs(A[3] - 3.) < 1e-10)
            );
-    numpy2c_double_inplace(get_object("b"), &A, &n);
+    numpy2c_double_inplace(p->pull("b"), &A, &n);
     _assert(n == 4);
     _assert(
             (fabs(A[0] - 0.)  < 1e-10) &&
@@ -47,16 +49,16 @@ void test_numpy()
            );
 
     double a[3] = {1., 5., 3.};
-    insert_object("A", c2numpy_double(a, 3));
-    cmd("assert (A == array([1., 5., 3.])).all()");
+    p->push("A", c2numpy_double(a, 3));
+    p->exec("assert (A == array([1., 5., 3.])).all()");
 
     // integer arrays
-    cmd("a = array(range(20), dtype='int32')");
-    cmd("assert a.strides == (4,)");
-    cmd("b = a[::5]");
-    cmd("assert b.strides == (20,)");
+    p->exec("a = array(range(20), dtype='int32')");
+    p->exec("assert a.strides == (4,)");
+    p->exec("b = a[::5]");
+    p->exec("assert b.strides == (20,)");
     int *B;
-    numpy2c_int_inplace(get_object("a"), &B, &n);
+    numpy2c_int_inplace(p->pull("a"), &B, &n);
     _assert(n == 20);
     _assert(
             (B[0] == 0) &&
@@ -64,7 +66,7 @@ void test_numpy()
             (B[2] == 2) &&
             (B[3] == 3)
            );
-    numpy2c_int_inplace(get_object("b"), &B, &n);
+    numpy2c_int_inplace(p->pull("b"), &B, &n);
     _assert(n == 4);
     _assert(
             (B[0] == 0) &&
@@ -74,22 +76,19 @@ void test_numpy()
            );
 
     int b[3] = {1, 5, 3};
-    insert_object("B", c2numpy_int(b, 3));
-    cmd("assert (B == array([1, 5, 3])).all()");
+    p->push("B", c2numpy_int(b, 3));
+    p->exec("assert (B == array([1, 5, 3])).all()");
 }
 
 int main(int argc, char* argv[])
 {
     try {
-        // This is a hack, this should be set somewhere else:
-        putenv((char *)"PYTHONPATH=../..");
-        Py_Initialize();
-        PySys_SetArgv(argc, argv);
-        if (import__hermes_common())
-            throw std::runtime_error("hermes_common failed to import.");
+        p = new Python(argc, argv);
 
         test_basic();
         test_numpy();
+
+        delete p;
 
         return ERROR_SUCCESS;
     } catch(std::exception const &ex) {
