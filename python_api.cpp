@@ -18,7 +18,8 @@ void Python::_init(int argc, char* argv[])
 {
     python_count++;
     if (python_count == 1) {
-        // This is a hack:
+        // This is a hack, so that we can load hermes_common below. Some better
+        // mechanism should be used instead, once we figure out how to do it:
         putenv((char *)"PYTHONPATH=../..");
         Py_Initialize();
         if (argc >= 0)
@@ -34,16 +35,11 @@ Python::~Python()
     // free the namespace:
     Py_DECREF(this->_namespace);
 
-    // Don't finalize the interpreter, because for some reason,
-    // import__hermes_common() doesn't work when called again in the second
-    // interpreter (segfaults). So for now we just keep one interpreter and
-    // that's it.
-    /*
+    // free the interpreter if this was the last instance using it:
     python_count--;
     if (python_count == 0) {
         Py_Finalize();
     }
-    */
 }
 
 void Python::print()
