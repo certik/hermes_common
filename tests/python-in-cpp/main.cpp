@@ -16,9 +16,9 @@ void _assert(bool a)
 // Test the global python instance
 void test_basic1()
 {
-    python->insert_object("i", c2py_int(5));
-    python->eval("i = i*2");
-    int i = py2c_int(python->get_object("i"));
+    python->push("i", c2py_int(5));
+    python->exec("i = i*2");
+    int i = py2c_int(python->pull("i"));
     _assert(i == 10);
 }
 
@@ -26,9 +26,9 @@ void test_basic1()
 void test_basic2()
 {
     Python *p = new Python();
-    p->insert_object("i", c2py_int(5));
-    p->eval("i = i*2");
-    int i = py2c_int(p->get_object("i"));
+    p->push("i", c2py_int(5));
+    p->exec("i = i*2");
+    int i = py2c_int(p->pull("i"));
     _assert(i == 10);
     delete p;
 }
@@ -37,16 +37,16 @@ void test_basic2()
 void test_basic3()
 {
     Python *p1 = new Python();
-    p1->insert_object("i", c2py_int(5));
-    p1->eval("i = i*2");
-    int i = py2c_int(p1->get_object("i"));
+    p1->push("i", c2py_int(5));
+    p1->exec("i = i*2");
+    int i = py2c_int(p1->pull("i"));
     _assert(i == 10);
     delete p1;
 
     Python *p2 = new Python();
-    p2->insert_object("i", c2py_int(5));
-    p2->eval("i = i*2");
-    i = py2c_int(p2->get_object("i"));
+    p2->push("i", c2py_int(5));
+    p2->exec("i = i*2");
+    i = py2c_int(p2->pull("i"));
     _assert(i == 10);
     delete p2;
 }
@@ -56,12 +56,12 @@ void test_basic4()
 {
     Python *p1 = new Python();
     Python *p2 = new Python();
-    p1->insert_object("i", c2py_int(5));
-    p2->insert_object("i", c2py_int(6));
-    p1->eval("i = i*2");
-    p2->eval("i = i*2");
-    int i1 = py2c_int(p1->get_object("i"));
-    int i2 = py2c_int(p2->get_object("i"));
+    p1->push("i", c2py_int(5));
+    p2->push("i", c2py_int(6));
+    p1->exec("i = i*2");
+    p2->exec("i = i*2");
+    int i1 = py2c_int(p1->pull("i"));
+    int i2 = py2c_int(p2->pull("i"));
     _assert(i1 == 10);
     _assert(i2 == 12);
     delete p1;

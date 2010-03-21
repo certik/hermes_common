@@ -26,11 +26,11 @@ public:
     Python(int argc, char* argv[]);
     ~Python();
     void print();
-    void eval(const char *text);
+    void exec(const char *text);
     // pushes an object to the namespace, stealing the reference
-    void insert_object(const char *name, PyObject *o);
+    void push(const char *name, PyObject *o);
     // pulls the object from the namespace, giving you the reference
-    PyObject *get_object(const char *name);
+    PyObject *pull(const char *name);
 private:
     PyObject *_namespace;
     void _init(int argc, char* argv[]);

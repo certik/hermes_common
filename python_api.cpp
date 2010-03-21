@@ -51,18 +51,18 @@ void Python::print()
     namespace_print(_namespace);
 }
 
-void Python::eval(const char *text)
+void Python::exec(const char *text)
 {
     run_cmd(text, this->_namespace);
 }
 
-void Python::insert_object(const char *name, PyObject *o)
+void Python::push(const char *name, PyObject *o)
 {
     namespace_push(this->_namespace, name, o);
     Py_DECREF(o);
 }
 
-PyObject *Python::get_object(const char *name)
+PyObject *Python::pull(const char *name)
 {
     return namespace_pull(this->_namespace, name);
 }
