@@ -62,9 +62,8 @@ void test_basic4()
     p2->eval("i = i*2");
     int i1 = py2c_int(p1->get_object("i"));
     int i2 = py2c_int(p2->get_object("i"));
-    // Fails so far:
-    //_assert(i1 == 10);
-    //_assert(i2 == 12);
+    _assert(i1 == 10);
+    _assert(i2 == 12);
     delete p1;
     delete p2;
 }

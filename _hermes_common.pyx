@@ -193,10 +193,21 @@ import traceback
 # this is important to be called here, otherwise we can't use the NumPy C/API:
 import_array()
 
-cdef api object create_new_namespace():
+cdef api object namespace_create():
     return {"verbose": False}
 
-global_namespace = create_new_namespace()
+cdef api void namespace_push(object namespace, const_char_p name, object o):
+    namespace.update({name: o})
+
+cdef api void namespace_print(object namespace):
+    print "-"*80
+    print "namespace:"
+    print namespace
+
+cdef api object namespace_pull(object namespace, const_char_p name):
+    return namespace.get(name)
+
+global_namespace = namespace_create()
 
 cdef api void cmd(const_char_p text):
     """
@@ -234,7 +245,7 @@ cdef api void insert_object(const_char_p name, object o):
 
     This prints "[ 1.  5.  3.]" (this is how the NumPy array is printed).
     """
-    global_namespace.update({name: o})
+    namespace_push(global_namespace, name, o)
 
 cdef api object get_object(const_char_p name):
     """
@@ -251,7 +262,7 @@ cdef api object get_object(const_char_p name):
     int n;
     numpy2c_double_inplace(get_object("A"), &A, &n);
     """
-    return global_namespace.get(name)
+    return namespace_pull(global_namespace, name)
 
 cdef api object c2py_int(int i):
     return i

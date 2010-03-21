@@ -3,7 +3,10 @@
 PyObject *(*c2py_CooMatrix)(struct CooMatrix *);
 PyObject *(*c2py_CSRMatrix)(struct CSRMatrix *);
 PyObject *(*c2py_CSCMatrix)(struct CSCMatrix *);
-PyObject *(*create_new_namespace)(void);
+PyObject *(*namespace_create)(void);
+void (*namespace_push)(PyObject *, const char*, PyObject *);
+void (*namespace_print)(PyObject *);
+PyObject *(*namespace_pull)(PyObject *, const char*);
 void (*cmd)(const char*);
 void (*set_verbose_cmd)(int);
 void (*insert_object)(const char*, PyObject *);
@@ -103,7 +106,10 @@ int import__hermes_common(void) {
   if (__Pyx_ImportFunction(module, "c2py_CooMatrix", (void (**)(void))&c2py_CooMatrix, "PyObject *(struct CooMatrix *)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "c2py_CSRMatrix", (void (**)(void))&c2py_CSRMatrix, "PyObject *(struct CSRMatrix *)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "c2py_CSCMatrix", (void (**)(void))&c2py_CSCMatrix, "PyObject *(struct CSCMatrix *)") < 0) goto bad;
-  if (__Pyx_ImportFunction(module, "create_new_namespace", (void (**)(void))&create_new_namespace, "PyObject *(void)") < 0) goto bad;
+  if (__Pyx_ImportFunction(module, "namespace_create", (void (**)(void))&namespace_create, "PyObject *(void)") < 0) goto bad;
+  if (__Pyx_ImportFunction(module, "namespace_push", (void (**)(void))&namespace_push, "void (PyObject *, const char*, PyObject *)") < 0) goto bad;
+  if (__Pyx_ImportFunction(module, "namespace_print", (void (**)(void))&namespace_print, "void (PyObject *)") < 0) goto bad;
+  if (__Pyx_ImportFunction(module, "namespace_pull", (void (**)(void))&namespace_pull, "PyObject *(PyObject *, const char*)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "cmd", (void (**)(void))&cmd, "void (const char*)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "set_verbose_cmd", (void (**)(void))&set_verbose_cmd, "void (int)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "insert_object", (void (**)(void))&insert_object, "void (const char*, PyObject *)") < 0) goto bad;

@@ -25,9 +25,13 @@ public:
     Python();
     Python(int argc, char* argv[]);
     ~Python();
+    void print();
     void eval(const char *text);
     void insert_object(const char *name, PyObject *o);
     PyObject *get_object(const char *name);
+private:
+    PyObject *_namespace;
+    void _init(int argc, char* argv[]);
 };
 
 #endif
