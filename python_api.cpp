@@ -59,6 +59,7 @@ void Python::eval(const char *text)
 void Python::insert_object(const char *name, PyObject *o)
 {
     namespace_push(this->_namespace, name, o);
+    Py_DECREF(o);
 }
 
 PyObject *Python::get_object(const char *name)
