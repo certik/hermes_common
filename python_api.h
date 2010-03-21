@@ -27,9 +27,9 @@ public:
     ~Python();
     void print();
     void exec(const char *text);
-    // pushes an object to the namespace, stealing the reference
+    // pushes the object to the namespace, stealing the reference
     void push(const char *name, PyObject *o);
-    // pulls the object from the namespace, giving you the reference
+    // pulls the object from the namespace, borrowing the reference
     PyObject *pull(const char *name);
 private:
     PyObject *_namespace;
