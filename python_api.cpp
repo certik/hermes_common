@@ -38,7 +38,9 @@ Python::~Python()
     // free the interpreter if this was the last instance using it:
     python_count--;
     if (python_count == 0) {
-        Py_Finalize();
+        // don't finalize python, because the numpy package segfaults when
+        // imported again:
+        //Py_Finalize();
     }
 }
 

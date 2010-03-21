@@ -80,6 +80,10 @@ int main(int argc, char* argv[])
 
         delete python;
 
+        // this tests that all Python() instances were uninitialized properly
+        test_basic3();
+        test_basic4();
+
         return ERROR_SUCCESS;
     } catch(std::exception const &ex) {
         std::cout << "Exception raised: " << ex.what() << "\n";
