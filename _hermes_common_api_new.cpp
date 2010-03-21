@@ -20,6 +20,8 @@ void (*numpy2c_int_inplace)(PyObject *, int **, int *);
 void (*numpy2c_double_inplace)(PyObject *, double **, int *);
 void (*run_cmd)(const char*, PyObject *);
 
+
+
 PyObject *__Pyx_ImportModule(const char *name) {
     PyObject *py_name = 0;
     PyObject *py_module = 0;
@@ -38,6 +40,8 @@ bad:
     Py_XDECREF(py_name);
     return 0;
 }
+
+
 
 int __Pyx_ImportFunction(PyObject *module, const char *funcname, void (**f)(void), const char *sig) {
     PyObject *d = 0;
@@ -121,3 +125,4 @@ int import__hermes_common(void) {
   Py_XDECREF(module);
   return -1;
 }
+
