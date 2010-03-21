@@ -62,5 +62,7 @@ void Python::push(const char *name, PyObject *o)
 
 PyObject *Python::pull(const char *name)
 {
-    return namespace_pull(this->_namespace, name);
+    PyObject *tmp = namespace_pull(this->_namespace, name);
+    Py_DECREF(tmp);
+    return tmp;
 }
