@@ -32,7 +32,9 @@ void Python::_init(int argc, char* argv[])
 
 Python::~Python()
 {
-    // free the namespace:
+    // Free the namespace. This frees all the dictionary items, so if there
+    // are some numpy arrays (or your classes) in the namespace, they will be
+    // deallocated at this time.
     Py_DECREF(this->_namespace);
 
     // free the interpreter if this was the last instance using it:
