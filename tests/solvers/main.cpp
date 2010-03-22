@@ -4,8 +4,6 @@
 #include "matrix.h"
 #include "python_solvers.h"
 
-#include "Python.h"
-
 #define EPS 1e-12
 
 #define ERROR_SUCCESS                               0
@@ -145,11 +143,6 @@ void test_solver4()
 int main(int argc, char* argv[])
 {
     try {
-        // This is a hack, this should be set somewhere else:
-        putenv((char *)"PYTHONPATH=../..");
-        Py_Initialize();
-        PySys_SetArgv(argc, argv);
-
         test_solver1();
         test_solver2();
         test_solver3();

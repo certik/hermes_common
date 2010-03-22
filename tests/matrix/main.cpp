@@ -3,8 +3,6 @@
 
 #include "matrix.h"
 
-#include "Python.h"
-
 #define ERROR_SUCCESS                               0
 #define ERROR_FAILURE                              -1
 
@@ -39,11 +37,6 @@ void test_matrix1()
 int main(int argc, char* argv[])
 {
     try {
-        // This is a hack, this should be set somewhere else:
-        putenv((char *)"PYTHONPATH=../..");
-        Py_Initialize();
-        PySys_SetArgv(argc, argv);
-
         test_matrix1();
 
         return ERROR_SUCCESS;
