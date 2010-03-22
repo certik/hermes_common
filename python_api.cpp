@@ -20,7 +20,7 @@ void Python::_init(int argc, char* argv[])
     if (python_count == 1) {
         // This is a hack, so that we can load hermes_common below. Some better
         // mechanism should be used instead, once we figure out how to do it:
-        putenv((char *)"PYTHONPATH=../..");
+        putenv((char *)"PYTHONPATH=../..:.");
         Py_Initialize();
         if (argc >= 0)
             PySys_SetArgv(argc, argv);
