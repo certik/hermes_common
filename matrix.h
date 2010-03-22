@@ -281,6 +281,7 @@ class CSRMatrix : public Matrix {
             this->A = NULL;
             this->IA = NULL;
             this->JA = NULL;
+            this->deallocate_arrays = false;
         }
         CSRMatrix(CooMatrix *m);
         CSRMatrix(CSCMatrix *m);
@@ -288,9 +289,11 @@ class CSRMatrix : public Matrix {
             this->add_from_dense_matrix(m);
         }
         ~CSRMatrix() {
-            delete[] this->A;
-            delete[] this->IA;
-            delete[] this->JA;
+            if (this->deallocate_arrays) {
+                delete[] this->A;
+                delete[] this->IA;
+                delete[] this->JA;
+            }
         }
 
         void add_from_dense_matrix(DenseMatrix *m) {
@@ -302,6 +305,7 @@ class CSRMatrix : public Matrix {
                     if (fabs(v) > 1e-12)
                         this->nnz++;
                 }
+            this->deallocate_arrays = true;
             this->A = new double[this->nnz];
             this->IA = new int[this->size+1];
             this->JA = new int[this->nnz];
@@ -362,7 +366,7 @@ class CSRMatrix : public Matrix {
         double *A;
         int *IA;
         int *JA;
-
+        bool deallocate_arrays;
 };
 
 class CSCMatrix : public Matrix {
@@ -375,11 +379,7 @@ class CSCMatrix : public Matrix {
         }
         CSCMatrix(CooMatrix *m);
         CSCMatrix(CSRMatrix *m);
-        ~CSCMatrix() {
-            delete[] this->A;
-            delete[] this->IA;
-            delete[] this->JA;
-        }
+        ~CSCMatrix() {}
 
         virtual void add(int m, int n, double v) {
             _error("CSC matrix add() not implemented.");

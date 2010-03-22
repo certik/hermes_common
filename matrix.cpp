@@ -200,16 +200,8 @@ void choldc(double **a, int n, double p[])
   }
 }
 
-int initialized=0;
-
 Matrix::Matrix()
 {
-    if (!initialized) {
-        // this is necessary, so that we can use Python from matrix.cpp:
-        if (import__hermes_common())
-            throw std::runtime_error("hermes_common failed to import.");
-        initialized=1;
-    }
     this->p = new Python();
 }
 
@@ -220,79 +212,85 @@ Matrix::~Matrix()
 
 CSRMatrix::CSRMatrix(CooMatrix *m):Matrix()
 {
-    insert_object("m", c2py_CooMatrix(m));
-    cmd("n = m.to_scipy_coo().tocsr()");
-    cmd("A = n.data");
-    cmd("IA = n.indptr");
-    cmd("JA = n.indices");
-    //XXX: this should *not* be inplace, we need to fix it.
-    numpy2c_double_inplace(get_object("A"), &(this->A), &(this->nnz));
-    numpy2c_int_inplace(get_object("IA"), &(this->IA), &(this->size));
-    numpy2c_int_inplace(get_object("JA"), &(this->JA), &(this->nnz));
+    p->push("m", c2py_CooMatrix(m));
+    p->exec("n = m.to_scipy_coo().tocsr()");
+    p->exec("A = n.data");
+    p->exec("IA = n.indptr");
+    p->exec("JA = n.indices");
+    //Note: these arrays are allocated by numpy and the pointers A, IA, JA
+    //point to them (inplace) so we will leave the deallocation to numpy
+    numpy2c_double_inplace(p->pull("A"), &(this->A), &(this->nnz));
+    numpy2c_int_inplace(p->pull("IA"), &(this->IA), &(this->size));
+    numpy2c_int_inplace(p->pull("JA"), &(this->JA), &(this->nnz));
     this->size--;
+    this->deallocate_arrays = false;
 }
 
 CSRMatrix::CSRMatrix(CSCMatrix *m):Matrix()
 {
-    insert_object("m", c2py_CSCMatrix(m));
-    cmd("n = m.to_scipy_csc().tocsr()");
-    cmd("A = n.data");
-    cmd("IA = n.indptr");
-    cmd("JA = n.indices");
-    //XXX: this should *not* be inplace, we need to fix it.
-    numpy2c_double_inplace(get_object("A"), &(this->A), &(this->nnz));
-    numpy2c_int_inplace(get_object("IA"), &(this->IA), &(this->size));
-    numpy2c_int_inplace(get_object("JA"), &(this->JA), &(this->nnz));
+    p->push("m", c2py_CSCMatrix(m));
+    p->exec("n = m.to_scipy_csc().tocsr()");
+    p->exec("A = n.data");
+    p->exec("IA = n.indptr");
+    p->exec("JA = n.indices");
+    //Note: these arrays are allocated by numpy and the pointers A, IA, JA
+    //point to them (inplace) so we will leave the deallocation to numpy
+    numpy2c_double_inplace(p->pull("A"), &(this->A), &(this->nnz));
+    numpy2c_int_inplace(p->pull("IA"), &(this->IA), &(this->size));
+    numpy2c_int_inplace(p->pull("JA"), &(this->JA), &(this->nnz));
     this->size--;
+    this->deallocate_arrays = false;
 }
 
 void CSRMatrix::print()
 {
-    insert_object("m", c2py_CSRMatrix(this));
-    cmd("S = str(m.to_scipy_csr())");
-    printf("%s\n", py2c_str(get_object("S")));
+    p->push("m", c2py_CSRMatrix(this));
+    p->exec("S = str(m.to_scipy_csr())");
+    printf("%s\n", py2c_str(p->pull("S")));
 }
 
 CSCMatrix::CSCMatrix(CooMatrix *m):Matrix()
 {
-    insert_object("m", c2py_CooMatrix(m));
-    cmd("n = m.to_scipy_coo().tocsc()");
-    cmd("A = n.data");
-    cmd("IA = n.indices");
-    cmd("JA = n.indptr");
-    //XXX: this should *not* be inplace, we need to fix it.
-    numpy2c_double_inplace(get_object("A"), &(this->A), &(this->nnz));
-    numpy2c_int_inplace(get_object("IA"), &(this->IA), &(this->nnz));
-    numpy2c_int_inplace(get_object("JA"), &(this->JA), &(this->size));
+    p->push("m", c2py_CooMatrix(m));
+    p->exec("n = m.to_scipy_coo().tocsc()");
+    p->exec("A = n.data");
+    p->exec("IA = n.indices");
+    p->exec("JA = n.indptr");
+    //Note: these arrays are allocated by numpy and the pointers A, IA, JA
+    //point to them (inplace) so we will leave the deallocation to numpy
+    numpy2c_double_inplace(p->pull("A"), &(this->A), &(this->nnz));
+    numpy2c_int_inplace(p->pull("IA"), &(this->IA), &(this->nnz));
+    numpy2c_int_inplace(p->pull("JA"), &(this->JA), &(this->size));
     this->size--;
 }
 
 CSCMatrix::CSCMatrix(CSRMatrix *m):Matrix()
 {
-    insert_object("m", c2py_CSRMatrix(m));
-    cmd("n = m.to_scipy_csr().tocsc()");
-    cmd("A = n.data");
-    cmd("IA = n.indices");
-    cmd("JA = n.indptr");
-    //XXX: this should *not* be inplace, we need to fix it.
-    numpy2c_double_inplace(get_object("A"), &(this->A), &(this->nnz));
-    numpy2c_int_inplace(get_object("IA"), &(this->IA), &(this->nnz));
-    numpy2c_int_inplace(get_object("JA"), &(this->JA), &(this->size));
+    p->push("m", c2py_CSRMatrix(m));
+    p->exec("n = m.to_scipy_csr().tocsc()");
+    p->exec("A = n.data");
+    p->exec("IA = n.indices");
+    p->exec("JA = n.indptr");
+    //Note: these arrays are allocated by numpy and the pointers A, IA, JA
+    //point to them (inplace) so we will leave the deallocation to numpy
+    numpy2c_double_inplace(p->pull("A"), &(this->A), &(this->nnz));
+    numpy2c_int_inplace(p->pull("IA"), &(this->IA), &(this->nnz));
+    numpy2c_int_inplace(p->pull("JA"), &(this->JA), &(this->size));
     this->size--;
 }
 
 void CSCMatrix::print()
 {
-    insert_object("m", c2py_CSCMatrix(this));
-    cmd("S = str(m.to_scipy_csc())");
-    printf("%s\n", py2c_str(get_object("S")));
+    p->push("m", c2py_CSCMatrix(this));
+    p->exec("S = str(m.to_scipy_csc())");
+    printf("%s\n", py2c_str(p->pull("S")));
 }
 
 void CooMatrix::print()
 {
-    insert_object("m", c2py_CooMatrix(this));
-    cmd("S = str(m.to_scipy_coo())");
-    printf("%s\n", py2c_str(get_object("S")));
+    p->push("m", c2py_CooMatrix(this));
+    p->exec("S = str(m.to_scipy_coo())");
+    printf("%s\n", py2c_str(p->pull("S")));
 }
 
 void solve_linear_system_dense(DenseMatrix *mat, double *res)
