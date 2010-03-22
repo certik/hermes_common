@@ -15,6 +15,8 @@
 #include <math.h>
 #include <string.h>
 
+#include "python_api.h"
+
 // printf debug information about the stiffness/Jacobi matrix
 #define _error(x) throw std::runtime_error(x)
 #define DEBUG_MATRIX 0
@@ -22,7 +24,7 @@
 class Matrix {
 public:
     Matrix();
-    virtual ~Matrix() { }
+    virtual ~Matrix();
     virtual int get_size() = 0;
     virtual void add(int m, int n, double v) = 0;
     virtual void add_block(int *iidx, int ilen, int *jidx, int jlen,
@@ -37,6 +39,8 @@ public:
     virtual void copy_into(Matrix *m) = 0;
     virtual void print() = 0;
     virtual void times_vector(double* vec, double* result, int rank) = 0;
+protected:
+    Python *p;
 };
 
 class Triple {

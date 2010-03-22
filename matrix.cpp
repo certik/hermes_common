@@ -210,6 +210,12 @@ Matrix::Matrix()
             throw std::runtime_error("hermes_common failed to import.");
         initialized=1;
     }
+    this->p = new Python();
+}
+
+Matrix::~Matrix()
+{
+    delete this->p;
 }
 
 CSRMatrix::CSRMatrix(CooMatrix *m):Matrix()
