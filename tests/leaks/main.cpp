@@ -57,7 +57,7 @@ void test_dealloc()
     MyCallback *c = new MyCallback();
     p->push("c", c2py_CppCallback(c));
     _assert(c->called == 0);
-    p->exec("from test_dealloc import A");
+    p->exec("from dealloc import A");
     p->exec("a = A(c)");
     p->exec("print 'A() was created'");
     _assert(c->called == 0);

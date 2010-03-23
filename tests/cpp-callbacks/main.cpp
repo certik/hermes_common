@@ -57,7 +57,7 @@ void test_api2()
 void test_callback()
 {
     Python *p = new Python();
-    p->exec("from test_callback import A");
+    p->exec("from callback import A");
     p->exec("a = A()");
     p->exec("print 'A() was created'");
     delete p;
