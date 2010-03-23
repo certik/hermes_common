@@ -16,8 +16,6 @@ def convert_h():
         line = lines[0]
 
     f.write("""
-extern PyObject *__Pyx_ImportModule(const char *name);
-extern int __Pyx_ImportFunction(PyObject *module, const char *funcname, void (**f)(void), const char *sig);
 extern int import__hermes_common(void);
 
 #endif\n""")

@@ -2,8 +2,6 @@
 #include <stdexcept>
 
 #include "python_api.h"
-#define __PYX_HAVE_RT_ImportModule
-#define __PYX_HAVE_RT_ImportFunction
 #include "my_api2_api.h"
 
 #include "cpp_api.h"
