@@ -49,7 +49,7 @@ class MyCallback: public CppCallback {
         int called;
 };
 
-void test_dealloc()
+void test_dealloc1()
 {
     Python *p = new Python();
     if (import_my_api2())
@@ -66,13 +66,30 @@ void test_dealloc()
     _assert(c->called == 1);
 }
 
+void test_dealloc2()
+{
+    MyCallback *c = new MyCallback();
+    {
+        Python p = Python();
+        p.push("c", c2py_CppCallback(c));
+        _assert(c->called == 0);
+        p.exec("from dealloc import A");
+        p.exec("a = A(c)");
+        p.exec("print 'A() was created'");
+        _assert(c->called == 0);
+    }
+    // This tests that the __del__ method of A() was callled:
+    _assert(c->called == 1);
+}
+
 int main(int argc, char* argv[])
 {
     try {
         // Enable this by hand if you want to test with big matrices (might
         // consume all your memory if something goes wrong):
         //test_leaks1();
-        test_dealloc();
+        test_dealloc1();
+        test_dealloc2();
 
         return ERROR_SUCCESS;
     } catch(std::exception const &ex) {
