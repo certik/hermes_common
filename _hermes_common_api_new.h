@@ -2,6 +2,8 @@
 #define __PYX_HAVE_API___hermes_common
 #include "Python.h"
 
+extern PyObject *(*c2numpy_int)(int *, int);
+extern PyObject *(*c2numpy_double)(double *, int);
 extern PyObject *(*c2py_CooMatrix)(struct CooMatrix *);
 extern PyObject *(*c2py_CSRMatrix)(struct CSRMatrix *);
 extern PyObject *(*c2py_CSCMatrix)(struct CSCMatrix *);
@@ -17,9 +19,7 @@ extern PyObject *(*c2py_int)(int);
 extern int (*py2c_int)(PyObject *);
 extern char *(*py2c_str)(PyObject *);
 extern double (*py2c_double)(PyObject *);
-extern PyObject *(*c2numpy_int)(int *, int);
 extern PyObject *(*c2numpy_int_inplace)(int *, int);
-extern PyObject *(*c2numpy_double)(double *, int);
 extern PyObject *(*c2numpy_double_inplace)(double *, int);
 extern void (*numpy2c_int_inplace)(PyObject *, int **, int *);
 extern void (*numpy2c_double_inplace)(PyObject *, double **, int *);

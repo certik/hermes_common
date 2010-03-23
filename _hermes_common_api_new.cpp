@@ -1,5 +1,7 @@
 #include "_hermes_common_api_new.h"
 
+PyObject *(*c2numpy_int)(int *, int);
+PyObject *(*c2numpy_double)(double *, int);
 PyObject *(*c2py_CooMatrix)(struct CooMatrix *);
 PyObject *(*c2py_CSRMatrix)(struct CSRMatrix *);
 PyObject *(*c2py_CSCMatrix)(struct CSCMatrix *);
@@ -15,9 +17,7 @@ PyObject *(*c2py_int)(int);
 int (*py2c_int)(PyObject *);
 char *(*py2c_str)(PyObject *);
 double (*py2c_double)(PyObject *);
-PyObject *(*c2numpy_int)(int *, int);
 PyObject *(*c2numpy_int_inplace)(int *, int);
-PyObject *(*c2numpy_double)(double *, int);
 PyObject *(*c2numpy_double_inplace)(double *, int);
 void (*numpy2c_int_inplace)(PyObject *, int **, int *);
 void (*numpy2c_double_inplace)(PyObject *, double **, int *);
@@ -103,6 +103,8 @@ int import__hermes_common(void) {
   PyObject *module = 0;
   module = __Pyx_ImportModule("_hermes_common");
   if (!module) goto bad;
+  if (__Pyx_ImportFunction(module, "c2numpy_int", (void (**)(void))&c2numpy_int, "PyObject *(int *, int)") < 0) goto bad;
+  if (__Pyx_ImportFunction(module, "c2numpy_double", (void (**)(void))&c2numpy_double, "PyObject *(double *, int)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "c2py_CooMatrix", (void (**)(void))&c2py_CooMatrix, "PyObject *(struct CooMatrix *)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "c2py_CSRMatrix", (void (**)(void))&c2py_CSRMatrix, "PyObject *(struct CSRMatrix *)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "c2py_CSCMatrix", (void (**)(void))&c2py_CSCMatrix, "PyObject *(struct CSCMatrix *)") < 0) goto bad;
@@ -118,9 +120,7 @@ int import__hermes_common(void) {
   if (__Pyx_ImportFunction(module, "py2c_int", (void (**)(void))&py2c_int, "int (PyObject *)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "py2c_str", (void (**)(void))&py2c_str, "char *(PyObject *)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "py2c_double", (void (**)(void))&py2c_double, "double (PyObject *)") < 0) goto bad;
-  if (__Pyx_ImportFunction(module, "c2numpy_int", (void (**)(void))&c2numpy_int, "PyObject *(int *, int)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "c2numpy_int_inplace", (void (**)(void))&c2numpy_int_inplace, "PyObject *(int *, int)") < 0) goto bad;
-  if (__Pyx_ImportFunction(module, "c2numpy_double", (void (**)(void))&c2numpy_double, "PyObject *(double *, int)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "c2numpy_double_inplace", (void (**)(void))&c2numpy_double_inplace, "PyObject *(double *, int)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "numpy2c_int_inplace", (void (**)(void))&numpy2c_int_inplace, "void (PyObject *, int **, int *)") < 0) goto bad;
   if (__Pyx_ImportFunction(module, "numpy2c_double_inplace", (void (**)(void))&numpy2c_double_inplace, "void (PyObject *, double **, int *)") < 0) goto bad;

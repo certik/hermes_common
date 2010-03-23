@@ -110,3 +110,7 @@ cdef extern from "matrix.h":
     c_CSCMatrix *new_CSCMatrix_size "new CSCMatrix" (int size)
     c_CSCMatrix *new_CSCMatrix_coo_matrix "new CSCMatrix" (c_CooMatrix *m)
     c_CSCMatrix *new_CSCMatrix_csr_matrix "new CSCMatrix" (c_CSRMatrix *m)
+
+
+cdef api object c2numpy_int(int *A, int len)
+cdef api object c2numpy_double(double *A, int len)
