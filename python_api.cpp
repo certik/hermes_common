@@ -59,12 +59,28 @@ void Python::exec(const char *text)
 void Python::push(const char *name, PyObject *o)
 {
     namespace_push(this->_namespace, name, o);
+    // namespace_push() is a regular Cython function and
+    // as such, it increfs the object "o" before storing it in the namespace,
+    // but we want to steal the reference, so we decref it here (there is still
+    // at least one reference stored in the dictionary this->_namespace, so
+    // it's safe). This is so that
+    //     this->push("i", c2py_int(5));
+    // doesn't leak (c2py_int() creates a python reference and push() destroys
+    // this python reference)
     Py_DECREF(o);
 }
 
 PyObject *Python::pull(const char *name)
 {
     PyObject *tmp = namespace_pull(this->_namespace, name);
+    // namespace_pull() is a regular Cython function and
+    // as such, it increfs the result before returning it, but we only want to
+    // borrow a reference, so we decref it here (there is still at least one
+    // reference stored in the dictionary this->_namespace, so it's safe)
+    // This is so that
+    //     int i = py2c_int(this->pull("i"));
+    // doesn't leak (pull() borrows the reference, py2c_int() doesn't do
+    // anything with the reference, so no leak nor segfault happens)
     Py_DECREF(tmp);
     return tmp;
 }
