@@ -308,7 +308,7 @@ double vec_dot(double* r, double* s, int n_dof)
 }
 
 
-void solve_linear_system_dense(DenseMatrix *mat, double *res)
+void solve_linear_system_dense_lu(DenseMatrix *mat, double *res)
 {
     int n = mat->get_size();
     int *indx = new int[n];
@@ -322,7 +322,7 @@ void solve_linear_system_dense(DenseMatrix *mat, double *res)
 void solve_linear_system(Matrix *mat, double *res)
 {
     DenseMatrix *dmat = new DenseMatrix(mat);
-    solve_linear_system_dense(dmat, res);
+    solve_linear_system_dense_lu(dmat, res);
     delete dmat;
 }
 

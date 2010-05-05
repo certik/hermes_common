@@ -434,7 +434,7 @@ void lubksb(double** a, int n, int* indx, double* b);
 
 // solve linear system
 void solve_linear_system(Matrix *mat, double *res);
-void solve_linear_system_dense(DenseMatrix *mat, double *res);
+void solve_linear_system_dense_lu(DenseMatrix *mat, double *res);
 int solve_linear_system_cg(Matrix* A, double *x,
                            int n_dof, double matrix_solver_tol,
                            int matrix_solver_maxiter);

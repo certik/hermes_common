@@ -55,7 +55,7 @@ void test_solver2()
 
     DenseMatrix B(&A);
 
-    solve_linear_system_dense(&B, res);
+    solve_linear_system_dense_lu(&B, res);
     _assert(fabs(res[0] - 0.2) < EPS);
     _assert(fabs(res[1] - 0.6) < EPS);
     _assert(fabs(res[2] - 0.6) < EPS);
