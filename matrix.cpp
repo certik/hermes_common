@@ -293,6 +293,21 @@ void CooMatrix::print()
     printf("%s\n", py2c_str(p->pull("S")));
 }
 
+// matrix vector multiplication
+void mat_dot(Matrix* A, double* x, double* result, int n_dof)
+{
+  A->times_vector(x, result, n_dof);
+}
+
+// vector vector multiplication
+double vec_dot(double* r, double* s, int n_dof)
+{
+  double result = 0;
+  for (int i=0; i < n_dof; i++) result += r[i]*s[i];
+  return result;
+}
+
+
 void solve_linear_system_dense(DenseMatrix *mat, double *res)
 {
     int n = mat->get_size();
@@ -309,4 +324,57 @@ void solve_linear_system(Matrix *mat, double *res)
     DenseMatrix *dmat = new DenseMatrix(mat);
     solve_linear_system_dense(dmat, res);
     delete dmat;
+}
+
+// Standard CG method starting from zero vector
+// (because we solve for the increment)
+// x... comes as right-hand side, leaves as solution
+int solve_linear_system_cg(Matrix* A, double *x,
+                           int n_dof, double matrix_solver_tol,
+                           int matrix_solver_maxiter)
+{
+  double *r = new double[n_dof];
+  double *p = new double[n_dof];
+  double *help_vec = new double[n_dof];
+  if (r == NULL || p == NULL || help_vec == NULL) {
+    _error("a vector could not be allocated in solve_linear_system_iter().");
+  }
+  // r = b - A*x0  (where b is x and x0 = 0)
+  for (int i=0; i < n_dof; i++) r[i] = x[i];
+  // p = r
+  for (int i=0; i < n_dof; i++) p[i] = r[i];
+
+  // setting initial condition x = 0
+  for (int i=0; i < n_dof; i++) x[i] = 0;
+
+  // CG iteration
+  int iter_current = 0;
+  double tol_current;
+  while (1) {
+    mat_dot(A, p, help_vec, n_dof);
+    double r_times_r = vec_dot(r, r, n_dof);
+    double alpha = r_times_r / vec_dot(p, help_vec, n_dof); 
+    for (int i=0; i < n_dof; i++) {
+      x[i] += alpha*p[i];
+      r[i] -= alpha*help_vec[i];
+    }
+    double r_times_r_new = vec_dot(r, r, n_dof);
+    iter_current++;
+    tol_current = sqrt(r_times_r_new);
+    if (tol_current < matrix_solver_tol 
+        || iter_current >= matrix_solver_maxiter) break;
+    double beta = r_times_r_new/r_times_r;
+    for (int i=0; i < n_dof; i++) p[i] = r[i] + beta*p[i];
+  }
+  int flag;
+  if (tol_current <= matrix_solver_tol) flag = 1;
+  else flag = 0;
+  if (r != NULL) delete [] r;
+  if (p != NULL) delete [] p;
+  if (help_vec != NULL) delete [] help_vec;
+
+  printf("CG (regular) made %d iteration(s) (tol = %g)\n", 
+         iter_current, tol_current);
+
+  return flag;
 }
