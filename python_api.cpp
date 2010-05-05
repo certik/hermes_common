@@ -1,6 +1,7 @@
 #include <stdexcept>
 
 #include "python_api.h"
+#include "matrix.h"
 
 static int python_count=0;
 
@@ -18,9 +19,19 @@ void Python::_init(int argc, char* argv[])
 {
     python_count++;
     if (python_count == 1) {
+        char *PYTHONPATH = getenv("PYTHONPATH");
+        if (PYTHONPATH == NULL)
+            _error("internal error in hermes_common: PYTHONPATH not defined");
+        int max_len = 10000;
+        char new_path[max_len];
         // This is a hack, so that we can load hermes_common below. Some better
         // mechanism should be used instead, once we figure out how to do it:
-        putenv((char *)"PYTHONPATH=.:../..:../../../python");
+        int nchars = snprintf(new_path, max_len, "PYTHONPATH=.:../..:../../../python:../hermes_common/:../../hermes_common/:%s", PYTHONPATH);
+        if (nchars >= max_len)
+            _error("internal error in hermes_common: PYTHONPATH too long.");
+        // We have to make a copy of the string, because new_path[] will get
+        // deallocated:
+        putenv(strdup(new_path));
         Py_Initialize();
         if (argc >= 0)
             PySys_SetArgv(argc, argv);
@@ -37,13 +48,15 @@ Python::~Python()
     // deallocated at this time.
     Py_DECREF(this->_namespace);
 
-    // free the interpreter if this was the last instance using it:
-    python_count--;
+    // The code below would free the interpreter if this was the last instance
+    // using it. However, it is currently disabled, because the numpy package
+    // segfaults when imported again; also the PYTHONPATH is set only once if
+    // python_count is never decreased (which is what we want).
+    /*python_count--;
     if (python_count == 0) {
-        // don't finalize python, because the numpy package segfaults when
-        // imported again:
-        //Py_Finalize();
+        Py_Finalize();
     }
+    */
 }
 
 void Python::print()
