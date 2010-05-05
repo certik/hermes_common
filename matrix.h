@@ -429,6 +429,9 @@ class CSCMatrix : public Matrix {
 void mat_dot(Matrix* A, double* x, double* result, int n_dof);
 double vec_dot(double* r, double* s, int n_dof);
 
+void ludcmp(double** a, int n, int* indx, double* d);
+void lubksb(double** a, int n, int* indx, double* b);
+
 // solve linear system
 void solve_linear_system(Matrix *mat, double *res);
 void solve_linear_system_dense(DenseMatrix *mat, double *res);

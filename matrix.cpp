@@ -55,11 +55,11 @@ void ludcmp(double** a, int n, int* indx, double* d);
 /// and can be left in place for successive calls with different right-hand sides b. This routine takes
 /// into account the possibility that b will begin with many zero elements, so it is efficient for use
 /// in matrix inversion.
-template<typename T>
-void lubksb(double** a, int n, int* indx, T* b)
+//template<typename T>
+void lubksb(double** a, int n, int* indx, double* b)
 {
   int i, ip, j;
-  T sum;
+  double sum;
 
   for (i = 0; i < n; i++)
   {
