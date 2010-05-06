@@ -283,16 +283,7 @@ class CSRMatrix : public Matrix {
             this->JA = NULL;
             this->deallocate_arrays = false;
         }
-        CSRMatrix(Matrix *m):Matrix() {
-            if (dynamic_cast<CooMatrix*>(m))
-                this->add_from_CooMatrix((CooMatrix*)m);
-            //else if (dynamic_cast<CSCMatrix*>(m))
-            //    this->add_from_CSCMatrix((CSCMatrix*)m);
-            else if (dynamic_cast<DenseMatrix*>(m))
-                this->add_from_DenseMatrix((DenseMatrix*)m);
-            else
-                _error("Matrix type not supported.");
-        }
+        CSRMatrix(Matrix *m);
         CSRMatrix(CooMatrix *m):Matrix() {
             this->add_from_CooMatrix(m);
         }

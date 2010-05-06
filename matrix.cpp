@@ -210,6 +210,17 @@ Matrix::~Matrix()
     delete this->p;
 }
 
+CSRMatrix::CSRMatrix(Matrix *m):Matrix() {
+    if (dynamic_cast<CooMatrix*>(m))
+        this->add_from_CooMatrix((CooMatrix*)m);
+    else if (dynamic_cast<CSCMatrix*>(m))
+        this->add_from_CSCMatrix((CSCMatrix*)m);
+    else if (dynamic_cast<DenseMatrix*>(m))
+        this->add_from_DenseMatrix((DenseMatrix*)m);
+    else
+        _error("Matrix type not supported.");
+}
+
 void CSRMatrix::add_from_CooMatrix(CooMatrix *m)
 {
     p->push("m", c2py_CooMatrix(m));

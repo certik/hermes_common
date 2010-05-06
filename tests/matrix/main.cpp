@@ -34,10 +34,40 @@ void test_matrix1()
     n4.print();
 }
 
+void test_matrix2()
+{
+    CooMatrix m(5);
+    m.add(1, 3, 3.5);
+    m.add(2, 3, 4.5);
+    m.add(3, 4, 1.5);
+    m.add(4, 2, 1.5);
+    m.add(2, 3, 1);
+    m.print();
+
+    Matrix *_m = &m;
+
+    printf("----\n");
+    // convert from COO
+    CSRMatrix n1(_m);
+    n1.print();
+    CSCMatrix n2(_m);
+    n2.print();
+
+    _m = &n2;
+    // convert CSR <-> CSC
+    CSRMatrix n3(_m);
+    n3.print();
+    _m = &n1;
+    CSCMatrix n4(_m);
+    n4.print();
+}
+
 int main(int argc, char* argv[])
 {
     try {
         test_matrix1();
+
+        test_matrix2();
 
         return ERROR_SUCCESS;
     } catch(std::exception const &ex) {
