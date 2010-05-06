@@ -210,7 +210,7 @@ Matrix::~Matrix()
     delete this->p;
 }
 
-CSRMatrix::CSRMatrix(CooMatrix *m):Matrix()
+void CSRMatrix::add_from_CooMatrix(CooMatrix *m)
 {
     p->push("m", c2py_CooMatrix(m));
     p->exec("n = m.to_scipy_coo().tocsr()");
@@ -226,7 +226,7 @@ CSRMatrix::CSRMatrix(CooMatrix *m):Matrix()
     this->deallocate_arrays = false;
 }
 
-CSRMatrix::CSRMatrix(CSCMatrix *m):Matrix()
+void CSRMatrix::add_from_CSCMatrix(CSCMatrix *m)
 {
     p->push("m", c2py_CSCMatrix(m));
     p->exec("n = m.to_scipy_csc().tocsr()");
@@ -249,7 +249,7 @@ void CSRMatrix::print()
     printf("%s\n", py2c_str(p->pull("S")));
 }
 
-CSCMatrix::CSCMatrix(CooMatrix *m):Matrix()
+void CSCMatrix::add_from_CooMatrix(CooMatrix *m)
 {
     p->push("m", c2py_CooMatrix(m));
     p->exec("n = m.to_scipy_coo().tocsc()");
@@ -264,7 +264,7 @@ CSCMatrix::CSCMatrix(CooMatrix *m):Matrix()
     this->size--;
 }
 
-CSCMatrix::CSCMatrix(CSRMatrix *m):Matrix()
+void CSCMatrix::add_from_CSRMatrix(CSRMatrix *m)
 {
     p->push("m", c2py_CSRMatrix(m));
     p->exec("n = m.to_scipy_csr().tocsc()");

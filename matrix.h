@@ -283,10 +283,24 @@ class CSRMatrix : public Matrix {
             this->JA = NULL;
             this->deallocate_arrays = false;
         }
-        CSRMatrix(CooMatrix *m);
-        CSRMatrix(CSCMatrix *m);
+        CSRMatrix(Matrix *m):Matrix() {
+            if (dynamic_cast<CooMatrix*>(m))
+                this->add_from_CooMatrix((CooMatrix*)m);
+            //else if (dynamic_cast<CSCMatrix*>(m))
+            //    this->add_from_CSCMatrix((CSCMatrix*)m);
+            else if (dynamic_cast<DenseMatrix*>(m))
+                this->add_from_DenseMatrix((DenseMatrix*)m);
+            else
+                _error("Matrix type not supported.");
+        }
+        CSRMatrix(CooMatrix *m):Matrix() {
+            this->add_from_CooMatrix(m);
+        }
+        CSRMatrix(CSCMatrix *m):Matrix() {
+            this->add_from_CSCMatrix(m);
+        }
         CSRMatrix(DenseMatrix *m):Matrix() {
-            this->add_from_dense_matrix(m);
+            this->add_from_DenseMatrix(m);
         }
         ~CSRMatrix() {
             if (this->deallocate_arrays) {
@@ -296,7 +310,7 @@ class CSRMatrix : public Matrix {
             }
         }
 
-        void add_from_dense_matrix(DenseMatrix *m) {
+        void add_from_DenseMatrix(DenseMatrix *m) {
             this->size = m->get_size();
             this->nnz = 0;
             for(int i = 0; i < this->size; i++)
@@ -323,6 +337,8 @@ class CSRMatrix : public Matrix {
                 this->IA[i+1] = count;
             }
         }
+        void add_from_CooMatrix(CooMatrix *m);
+        void add_from_CSCMatrix(CSCMatrix *m);
 
         virtual void add(int m, int n, double v) {
             _error("CSR matrix add() not implemented.");
@@ -377,9 +393,24 @@ class CSCMatrix : public Matrix {
             this->IA = NULL;
             this->JA = NULL;
         }
-        CSCMatrix(CooMatrix *m);
-        CSCMatrix(CSRMatrix *m);
+        CSCMatrix(Matrix *m):Matrix() {
+            if (dynamic_cast<CooMatrix*>(m))
+                this->add_from_CooMatrix((CooMatrix*)m);
+            else if (dynamic_cast<CSRMatrix*>(m))
+                this->add_from_CSRMatrix((CSRMatrix*)m);
+            else
+                _error("Matrix type not supported.");
+        }
+        CSCMatrix(CooMatrix *m):Matrix() {
+            this->add_from_CooMatrix(m);
+        }
+        CSCMatrix(CSRMatrix *m):Matrix() {
+            this->add_from_CSRMatrix(m);
+        }
         ~CSCMatrix() {}
+
+        void add_from_CooMatrix(CooMatrix *m);
+        void add_from_CSRMatrix(CSRMatrix *m);
 
         virtual void add(int m, int n, double v) {
             _error("CSC matrix add() not implemented.");
