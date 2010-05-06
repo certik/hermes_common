@@ -106,7 +106,7 @@ void test_solver3()
     _assert(fabs(res[3] - 0.2) < EPS);
 
     res = {1., 1., 1., 1.};
-    solve_linear_system_cg(&A, res, A.get_size(), EPS, 100);
+    _assert(solve_linear_system_cg(&A, res, EPS, 2) == 1);
     _assert(fabs(res[0] - 0.2) < EPS);
     _assert(fabs(res[1] - 0.6) < EPS);
     _assert(fabs(res[2] - 0.6) < EPS);

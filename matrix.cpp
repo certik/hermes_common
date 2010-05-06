@@ -341,9 +341,10 @@ void solve_linear_system_dense_lu(Matrix *mat, double *res)
 // (because we solve for the increment)
 // x... comes as right-hand side, leaves as solution
 int solve_linear_system_cg(Matrix* A, double *x,
-                           int n_dof, double matrix_solver_tol,
+                           double matrix_solver_tol,
                            int matrix_solver_maxiter)
 {
+  int n_dof = A->get_size();
   double *r = new double[n_dof];
   double *p = new double[n_dof];
   double *help_vec = new double[n_dof];
