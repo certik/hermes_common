@@ -308,22 +308,22 @@ double vec_dot(double* r, double* s, int n_dof)
 }
 
 
-void solve_linear_system_dense_lu(DenseMatrix *mat, double *res)
+void solve_linear_system_dense_lu(Matrix *mat, double *res)
 {
-    int n = mat->get_size();
+    DenseMatrix *dmat = dynamic_cast<DenseMatrix*>(mat);
+    bool free_dmat = false;
+    if (dmat == NULL) {
+        dmat = new DenseMatrix(mat);
+        free_dmat = true;
+    }
+    int n = dmat->get_size();
     int *indx = new int[n];
-    double **_mat = mat->get_mat();
+    double **_mat = dmat->get_mat();
     double d;
     ludcmp(_mat, n, indx, &d);
     lubksb(_mat, n, indx, res);
-}
-
-
-void solve_linear_system(Matrix *mat, double *res)
-{
-    DenseMatrix *dmat = new DenseMatrix(mat);
-    solve_linear_system_dense_lu(dmat, res);
-    delete dmat;
+    if (free_dmat)
+        delete dmat;
 }
 
 // Standard CG method starting from zero vector

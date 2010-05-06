@@ -30,7 +30,7 @@ void test_solver1()
 
     double res[4] = {1., 1., 1., 1.};
 
-    solve_linear_system(&A, res);
+    solve_linear_system_dense_lu(&A, res);
     _assert(fabs(res[0] - 0.2) < EPS);
     _assert(fabs(res[1] - 0.6) < EPS);
     _assert(fabs(res[2] - 0.6) < EPS);
@@ -53,7 +53,14 @@ void test_solver2()
 
     double res[4] = {1., 1., 1., 1.};
 
+    solve_linear_system_dense_lu(&A, res);
+    _assert(fabs(res[0] - 0.2) < EPS);
+    _assert(fabs(res[1] - 0.6) < EPS);
+    _assert(fabs(res[2] - 0.6) < EPS);
+    _assert(fabs(res[3] - 0.2) < EPS);
+
     DenseMatrix B(&A);
+    res = {1., 1., 1., 1.};
 
     solve_linear_system_dense_lu(&B, res);
     _assert(fabs(res[0] - 0.2) < EPS);
