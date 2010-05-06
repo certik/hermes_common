@@ -7,7 +7,7 @@
 
 #include "python_api.h"
 
-void solve_linear_system_numpy(CooMatrix *mat, double *res)
+void solve_linear_system_numpy(Matrix *mat, double *res)
 {
     CSRMatrix M(mat);
     Python *p = new Python();
@@ -23,7 +23,7 @@ void solve_linear_system_numpy(CooMatrix *mat, double *res)
     delete p;
 }
 
-void solve_linear_system_scipy_umfpack(CooMatrix *mat, double *res)
+void solve_linear_system_scipy_umfpack(Matrix *mat, double *res)
 {
     CSCMatrix M(mat);
     Python *p = new Python();
@@ -39,7 +39,7 @@ void solve_linear_system_scipy_umfpack(CooMatrix *mat, double *res)
     delete p;
 }
 
-void solve_linear_system_scipy_cg(CooMatrix *mat, double *res)
+void solve_linear_system_scipy_cg(Matrix *mat, double *res)
 {
     CSRMatrix M(mat);
     Python *p = new Python();
@@ -55,7 +55,7 @@ void solve_linear_system_scipy_cg(CooMatrix *mat, double *res)
     delete p;
 }
 
-void solve_linear_system_scipy_gmres(CooMatrix *mat, double *res)
+void solve_linear_system_scipy_gmres(Matrix *mat, double *res)
 {
     CSRMatrix M(mat);
     Python *p = new Python();

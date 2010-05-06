@@ -6,9 +6,9 @@
 #ifndef __HERMES_COMMON_PYTHON_SOLVERS_H
 #define __HERMES_COMMON_PYTHON_SOLVERS_H
 
-void solve_linear_system_numpy(CooMatrix *mat, double *res);
-void solve_linear_system_scipy_umfpack(CooMatrix *mat, double *res);
-void solve_linear_system_scipy_cg(CooMatrix *mat, double *res);
-void solve_linear_system_scipy_gmres(CooMatrix *mat, double *res);
+void solve_linear_system_numpy(Matrix *mat, double *res);
+void solve_linear_system_scipy_umfpack(Matrix *mat, double *res);
+void solve_linear_system_scipy_cg(Matrix *mat, double *res);
+void solve_linear_system_scipy_gmres(Matrix *mat, double *res);
 
 #endif
