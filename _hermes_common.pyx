@@ -29,8 +29,8 @@ cdef class SparseMatrix(Matrix):
 
 cdef class CooMatrix(SparseMatrix):
 
-    def __init__(self, size=0):
-        self.thisptr = <c_Matrix *>new_CooMatrix(size)
+    def __init__(self, size=0, is_complex=False):
+        self.thisptr = <c_Matrix *>new_CooMatrix(size, is_complex)
 
     @property
     def row_col_data(self):
