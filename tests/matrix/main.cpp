@@ -65,11 +65,11 @@ void test_matrix2()
 void test_matrix3()
 {
     CooMatrix m(5, true);
-    m.add(1, 3, 3.5);
-    m.add(2, 3, 4.5);
-    m.add(3, 4, 1.5);
-    m.add(4, 2, 1.5);
-    m.add(2, 3, 1);
+    m.add(1, 3, cplx(3.5));
+    m.add(2, 3, cplx(4.5));
+    m.add(3, 4, cplx(1.5));
+    m.add(4, 2, cplx(1.5));
+    m.add(2, 3, cplx(1));
     m.print();
 
     printf("----\n");
