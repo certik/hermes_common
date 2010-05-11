@@ -80,14 +80,19 @@ cdef extern from "stdcython.h":
 
 cdef extern from "matrix.h":
 
+    ctypedef struct cplx "std::complex<double>"
+    cplx create_cplx "cplx"(int, int)
+
     cdef struct c_Matrix "Matrix":
         int get_size()
+        int is_complex()
         void add(int m, int n, double v)
+        void add_cplx "add"(int m, int n, cplx v)
 
     cdef struct c_CooMatrix "CooMatrix":
         int triplets_len()
         void get_row_col_data(int *row, int *col, double *data)
-    c_CooMatrix *new_CooMatrix "new CooMatrix" (int size, bool is_complex)
+    c_CooMatrix *new_CooMatrix "new CooMatrix" (int size, int is_complex)
 
     cdef struct c_CSCMatrix "CSCMatrix"
 

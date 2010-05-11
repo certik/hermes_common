@@ -55,6 +55,9 @@ public:
     }
     virtual void copy_into(Matrix *m) = 0;
     virtual void print() = 0;
+    virtual bool is_complex() {
+        return false;
+    }
     virtual void times_vector(double* vec, double* result, int rank) {
 	    _error("internal error: times_vector() not implemented.");
     }
@@ -98,6 +101,10 @@ class CooMatrix : public Matrix {
         }
         ~CooMatrix() {
             this->set_zero();
+        }
+
+        virtual bool is_complex() {
+            return this->_is_complex;
         }
 
         template <typename SCALAR>
