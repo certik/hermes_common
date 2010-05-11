@@ -113,6 +113,8 @@ class CooMatrix : public Matrix {
         virtual void set_zero();
 
         virtual void add(int m, int n, double v) {
+            if (this->_is_complex)
+                _error("can't use add(int, int, double) for complex matrix");
             // adjusting size if necessary
             if (m+1 > this->size) this->size = m+1;
             if (n+1 > this->size) this->size = n+1;
@@ -131,6 +133,8 @@ class CooMatrix : public Matrix {
         }
 
         virtual void add(int m, int n, cplx v) {
+            if (!(this->_is_complex))
+                _error("can't use add(int, int, cplx) for real matrix");
             // adjusting size if necessary
             if (m+1 > this->size) this->size = m+1;
             if (n+1 > this->size) this->size = n+1;
