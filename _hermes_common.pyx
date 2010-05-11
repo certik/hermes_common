@@ -12,9 +12,6 @@ cdef inline char_p str2cp(object s) except ? NULL:
     else:         return s
 
 
-cdef cplx py2cplx(n):
-    return create_cplx(n.real, n.imag)
-
 #-----------------------------------------------------------------------
 # Matrix classes:
 
@@ -37,7 +34,7 @@ cdef class CooMatrix(SparseMatrix):
 
     def add(self, int m, int n, v):
         if self.thisptr.is_complex():
-            self.thisptr.add_cplx(m, n, py2cplx(v))
+            self.thisptr.add_cplx(m, n, v)
         else:
             self.thisptr.add(m, n, v)
 

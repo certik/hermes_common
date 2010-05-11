@@ -3,6 +3,9 @@
 # file for the exact terms).
 # Email: hermes1d@googlegroups.com, home page: http://hpfem.org/
 
+ctypedef double complex cplx
+
+
 cdef extern from *:
     ctypedef char* char_p       "char*"
     ctypedef char* const_char_p "const char*"
@@ -79,9 +82,6 @@ cdef extern from "stdcython.h":
     void throw_exception(char *msg)
 
 cdef extern from "matrix.h":
-
-    ctypedef struct cplx "std::complex<double>"
-    cplx create_cplx "cplx"(int, int)
 
     cdef struct c_Matrix "Matrix":
         int get_size()
