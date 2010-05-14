@@ -215,6 +215,71 @@ void test_solver5()
     _assert(fabs(res[4].imag() - 0.) < EPS);
 }
 
+void test_solver6()
+{
+    CooMatrix A(2, true);
+    A.add(0, 0, cplx(1, 1));
+    A.add(0, 1, cplx(2, 2));
+    A.add(1, 0, cplx(3, 3));
+    A.add(1, 1, cplx(4, 4));
+
+    cplx res[2];
+
+    //----------------------
+
+    res[0] = cplx(1);
+    res[1] = cplx(2);
+    solve_linear_system_numpy(&A, res);
+    _assert(fabs(res[0].real() - 0) < EPS);
+    _assert(fabs(res[1].real() - 0.25) < EPS);
+    _assert(fabs(res[0].imag() - 0.) < EPS);
+    _assert(fabs(res[1].imag() - (-0.25)) < EPS);
+
+    res[0] = cplx(1);
+    res[1] = cplx(2);
+    solve_linear_system_scipy_umfpack(&A, res);
+    _assert(fabs(res[0].real() - 0) < EPS);
+    _assert(fabs(res[1].real() - 0.25) < EPS);
+    _assert(fabs(res[0].imag() - 0.) < EPS);
+    _assert(fabs(res[1].imag() - (-0.25)) < EPS);
+
+    //----------------------
+
+    res[0] = cplx(1, 1);
+    res[1] = cplx(2, 2);
+    solve_linear_system_numpy(&A, res);
+    _assert(fabs(res[0].real() - 0) < EPS);
+    _assert(fabs(res[1].real() - 0.5) < EPS);
+    _assert(fabs(res[0].imag() - 0.) < EPS);
+    _assert(fabs(res[1].imag() - 0.) < EPS);
+
+    res[0] = cplx(1, 1);
+    res[1] = cplx(2, 2);
+    solve_linear_system_scipy_umfpack(&A, res);
+    _assert(fabs(res[0].real() - 0) < EPS);
+    _assert(fabs(res[1].real() - 0.5) < EPS);
+    _assert(fabs(res[0].imag() - 0.) < EPS);
+    _assert(fabs(res[1].imag() - 0.) < EPS);
+
+    //----------------------
+
+    res[0] = cplx(2, 1);
+    res[1] = cplx(2, 2);
+    solve_linear_system_numpy(&A, res);
+    _assert(fabs(res[0].real() - (-1)) < EPS);
+    _assert(fabs(res[1].real() - 1.25) < EPS);
+    _assert(fabs(res[0].imag() - 1.) < EPS);
+    _assert(fabs(res[1].imag() - (-0.75)) < EPS);
+
+    res[0] = cplx(2, 1);
+    res[1] = cplx(2, 2);
+    solve_linear_system_scipy_umfpack(&A, res);
+    _assert(fabs(res[0].real() - (-1)) < EPS);
+    _assert(fabs(res[1].real() - 1.25) < EPS);
+    _assert(fabs(res[0].imag() - 1.) < EPS);
+    _assert(fabs(res[1].imag() - (-0.75)) < EPS);
+}
+
 int main(int argc, char* argv[])
 {
     try {
@@ -223,6 +288,7 @@ int main(int argc, char* argv[])
         test_solver3();
         test_solver4();
         test_solver5();
+        test_solver6();
 
         return ERROR_SUCCESS;
     } catch(std::exception const &ex) {
