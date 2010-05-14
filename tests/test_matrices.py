@@ -125,7 +125,7 @@ def test_matrix5():
         ])
     _coo_conversions_test(m, d2)
 
-def test_matrix5():
+def test_matrix6():
     m = CooMatrix(5, is_complex=True)
     m.add(1, 3, 3.5+1j)
     m.add(2, 3, 4.5+2j)
@@ -136,6 +136,22 @@ def test_matrix5():
         [0, 0, 1.5+4j, 0, 0],
         [0, 0, 0, 3.5+1j, 0],
         [0, 0, 0, 5.5+2j, 0],
+        [0, 0, 0, 0, 1.5+3j],
+        [0, 0, 0, 0, 0],
+        ])
+    _coo_conversions_test(m, d2)
+
+def test_matrix7():
+    m = CooMatrix(5, is_complex=True)
+    m.add(1, 3, 3.5+1j)
+    m.add(2, 3, 4.5+2j)
+    m.add(3, 4, 1.5+3j)
+    m.add(1, 3, 1.5+4j)
+    m.add(2, 3, 1+4j)
+    d2 = array([
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 5+5j, 0],
+        [0, 0, 0, 5.5+6j, 0],
         [0, 0, 0, 0, 1.5+3j],
         [0, 0, 0, 0, 0],
         ])

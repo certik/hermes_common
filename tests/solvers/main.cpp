@@ -162,6 +162,56 @@ void test_solver4()
     _assert(fabs(res[4] - 5.) < EPS);
 }
 
+void test_solver5()
+{
+    CooMatrix A(5);
+    A.add(0, 0, 2);
+    A.add(0, 1, 3);
+    A.add(1, 0, 3);
+    A.add(1, 2, 4);
+    A.add(1, 4, 6);
+    A.add(2, 1, -1);
+    A.add(2, 2, -3);
+    A.add(2, 3, 2);
+    A.add(3, 2, 1);
+    A.add(4, 1, 4);
+    A.add(4, 2, 2);
+    A.add(4, 4, 1);
+
+    cplx res[5];
+
+    /*
+    res[0] = cplx(8.);
+    res[1] = cplx(45.);
+    res[2] = cplx(-3.);
+    res[3] = cplx(3.);
+    res[4] = cplx(19.);
+    solve_linear_system_numpy(&A, res);
+    _assert(fabs(res[0] - 1.) < EPS);
+    _assert(fabs(res[1] - 2.) < EPS);
+    _assert(fabs(res[2] - 3.) < EPS);
+    _assert(fabs(res[3] - 4.) < EPS);
+    _assert(fabs(res[4] - 5.) < EPS);
+    */
+
+    res[0] = cplx(8.);
+    res[1] = cplx(45.);
+    res[2] = cplx(-3.);
+    res[3] = cplx(3.);
+    res[4] = cplx(19.);
+    solve_linear_system_scipy_umfpack(&A, res);
+    _assert(fabs(res[0].real() - 1.) < EPS);
+    _assert(fabs(res[1].real() - 2.) < EPS);
+    _assert(fabs(res[2].real() - 3.) < EPS);
+    _assert(fabs(res[3].real() - 4.) < EPS);
+    _assert(fabs(res[4].real() - 5.) < EPS);
+    _assert(fabs(res[0].imag() - 0.) < EPS);
+    _assert(fabs(res[1].imag() - 0.) < EPS);
+    _assert(fabs(res[2].imag() - 0.) < EPS);
+    _assert(fabs(res[3].imag() - 0.) < EPS);
+    _assert(fabs(res[4].imag() - 0.) < EPS);
+}
+
 int main(int argc, char* argv[])
 {
     try {
@@ -169,6 +219,7 @@ int main(int argc, char* argv[])
         test_solver2();
         test_solver3();
         test_solver4();
+        test_solver5();
 
         return ERROR_SUCCESS;
     } catch(std::exception const &ex) {

@@ -44,14 +44,14 @@ void solve_linear_system_scipy_umfpack(Matrix *mat, cplx *res)
     CSCMatrix M(mat);
     Python *p = new Python();
     p->push("m", c2py_CSCMatrix(&M));
-    //p->push("rhs", c2numpy_double_inplace(res, mat->get_size()));
+    p->push("rhs", c2numpy_double_complex_inplace(res, mat->get_size()));
     p->exec("A = m.to_scipy_csc()");
     p->exec("from scipy.sparse.linalg import spsolve");
     p->exec("x = spsolve(A, rhs)");
     cplx *x;
     int n;
-    //numpy2c_double_inplace(p->pull("x"), &x, &n);
-    memcpy(res, x, n*sizeof(double));
+    numpy2c_double_complex_inplace(p->pull("x"), &x, &n);
+    memcpy(res, x, n*sizeof(cplx));
     delete p;
 }
 
