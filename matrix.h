@@ -197,6 +197,18 @@ class CooMatrix : public Matrix {
             }
         }
 
+        void get_row_col_data(int *row, int *col, cplx *data) {
+            Triple<cplx> *t = this->list_cplx;
+            int i = 0;
+            while (t != NULL) {
+                row[i] = t->i;
+                col[i] = t->j;
+                data[i] = t->v;
+                i++;
+                t = t->next;
+            }
+        }
+
         virtual double get(int m, int n) {
             double v=0;
             Triple<double> *t = this->list;

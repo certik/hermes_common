@@ -48,14 +48,20 @@ cdef class CooMatrix(SparseMatrix):
         cdef int n, len
         cdef int *crow, *ccol
         cdef double *cdata
+        cdef cplx *ccdata
         len = _thisptr.triplets_len()
         row = empty([len], dtype="int32")
         numpy2c_int_inplace(row, &crow, &n)
         col = empty([len], dtype="int32")
         numpy2c_int_inplace(col, &ccol, &n)
-        data = empty([len], dtype="double")
-        numpy2c_double_inplace(data, &cdata, &n)
-        _thisptr.get_row_col_data(crow, ccol, cdata)
+        if self.thisptr.is_complex():
+            data = empty([len], dtype="complex128")
+            numpy2c_double_complex_inplace(data, &ccdata, &n)
+            _thisptr.get_row_col_data_cplx(crow, ccol, ccdata)
+        else:
+            data = empty([len], dtype="double")
+            numpy2c_double_inplace(data, &cdata, &n)
+            _thisptr.get_row_col_data(crow, ccol, cdata)
         return row, col, data
 
     def to_scipy_coo(self):
@@ -357,6 +363,26 @@ cdef api void numpy2c_double_inplace(object A_n, double **A_c, int *n):
         _AA = A
     n[0] = len(A)
     A_c[0] = <double *>(A.data)
+
+cdef api void numpy2c_double_complex_inplace(object A_n, cplx **A_c, int *n):
+    """
+    Returns the C array, that points to the numpy array (inplace).
+
+    Only if strides != sizeof(double), the data get copied first.
+
+    Important note: you need to use the A_c array immediately after calling
+    this function in C, otherwise numpy could deallocate the array, especially
+    if the _AA global variable was deallocated.
+    """
+    cdef ndarray A = A_n
+    if not (A.nd == 1 and A.strides[0] == sizeof(cplx)):
+        from numpy import array
+        A = array(A.flat, dtype="complex128")
+        # this is needed so that numpy doesn't dealocate the arrays
+        global _AA
+        _AA = A
+    n[0] = len(A)
+    A_c[0] = <cplx *>(A.data)
 
 cdef api void run_cmd(const_char_p text, object namespace):
     try:

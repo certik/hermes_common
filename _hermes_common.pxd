@@ -92,6 +92,8 @@ cdef extern from "matrix.h":
     cdef struct c_CooMatrix "CooMatrix":
         int triplets_len()
         void get_row_col_data(int *row, int *col, double *data)
+        void get_row_col_data_cplx "get_row_col_data"(int *row, int *col,
+                cplx *data)
     c_CooMatrix *new_CooMatrix "new CooMatrix" (int size, int is_complex)
 
     cdef struct c_CSCMatrix "CSCMatrix"
