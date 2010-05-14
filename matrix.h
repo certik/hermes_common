@@ -56,13 +56,14 @@ public:
     virtual void copy_into(Matrix *m) = 0;
     virtual void print() = 0;
     virtual bool is_complex() {
-        return false;
+        return this->_is_complex;
     }
     virtual void times_vector(double* vec, double* result, int rank) {
 	    _error("internal error: times_vector() not implemented.");
     }
 protected:
     Python *p;
+    bool _is_complex;
 };
 
 template <typename SCALAR>
@@ -101,10 +102,6 @@ class CooMatrix : public Matrix {
         }
         ~CooMatrix() {
             this->set_zero();
-        }
-
-        virtual bool is_complex() {
-            return this->_is_complex;
         }
 
         template <typename SCALAR>
@@ -183,6 +180,16 @@ class CooMatrix : public Matrix {
             return len;
         }
 
+        int triplets_len_cplx() {
+            Triple<cplx> *t = this->list_cplx;
+            int len = 0;
+            while (t != NULL) {
+                len++;
+                t = t->next;
+            }
+            return len;
+        }
+
         // Returns the row/col indices, together with the data. All row, col
         // and data arrays have to be initialized (use this->triplets_len).
         void get_row_col_data(int *row, int *col, double *data) {
@@ -246,7 +253,6 @@ class CooMatrix : public Matrix {
 
     private:
         int size;
-        bool _is_complex;
         /*
            We represent the COO matrix as a list of Triples (i, j, v), where
            (i, j) can be redundant (then the corresponding "v" have to be
@@ -367,7 +373,6 @@ class DenseMatrix : public Matrix {
 
     private:
         int size;
-        bool _is_complex;
 
 };
 
@@ -462,13 +467,14 @@ class CSRMatrix : public Matrix {
             return this->A;
         }
         cplx *get_A_cplx() {
-            _error("get_A_cplx not implemented yet");
+            return this->A_cplx;
         }
 
     private:
         int size;
         int nnz;
         double *A;
+        cplx *A_cplx;
         int *IA;
         int *JA;
         bool deallocate_arrays;
@@ -532,11 +538,15 @@ class CSCMatrix : public Matrix {
         double *get_A() {
             return this->A;
         }
+        cplx *get_A_cplx() {
+            return this->A_cplx;
+        }
 
     private:
         int size;
         int nnz;
         double *A;
+        cplx *A_cplx;
         int *IA;
         int *JA;
 

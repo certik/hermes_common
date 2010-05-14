@@ -52,6 +52,10 @@ cdef extern from "arrayobject.h":
         NPY_NTYPES
         NPY_NOTYPE
 
+        NPY_COMPLEX32
+        NPY_COMPLEX64
+        NPY_COMPLEX128
+
     ctypedef int npy_intp
 
     ctypedef extern class numpy.ndarray [object PyArrayObject]:
@@ -91,6 +95,7 @@ cdef extern from "matrix.h":
 
     cdef struct c_CooMatrix "CooMatrix":
         int triplets_len()
+        int triplets_len_cplx()
         void get_row_col_data(int *row, int *col, double *data)
         void get_row_col_data_cplx "get_row_col_data"(int *row, int *col,
                 cplx *data)
@@ -103,6 +108,7 @@ cdef extern from "matrix.h":
         int *get_IA()
         int *get_JA()
         double *get_A()
+        cplx *get_A_cplx()
         int get_nnz()
     c_CSRMatrix *new_CSRMatrix_size "new CSRMatrix" (int size)
     c_CSRMatrix *new_CSRMatrix_coo_matrix "new CSRMatrix" (c_CooMatrix *m)
@@ -113,6 +119,7 @@ cdef extern from "matrix.h":
         int *get_IA()
         int *get_JA()
         double *get_A()
+        cplx *get_A_cplx()
         int get_nnz()
     c_CSCMatrix *new_CSCMatrix_size "new CSCMatrix" (int size)
     c_CSCMatrix *new_CSCMatrix_coo_matrix "new CSCMatrix" (c_CooMatrix *m)

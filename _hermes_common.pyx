@@ -49,7 +49,10 @@ cdef class CooMatrix(SparseMatrix):
         cdef int *crow, *ccol
         cdef double *cdata
         cdef cplx *ccdata
-        len = _thisptr.triplets_len()
+        if self.thisptr.is_complex():
+            len = _thisptr.triplets_len_cplx()
+        else:
+            len = _thisptr.triplets_len()
         row = empty([len], dtype="int32")
         numpy2c_int_inplace(row, &crow, &n)
         col = empty([len], dtype="int32")
@@ -58,6 +61,7 @@ cdef class CooMatrix(SparseMatrix):
             data = empty([len], dtype="complex128")
             numpy2c_double_complex_inplace(data, &ccdata, &n)
             _thisptr.get_row_col_data_cplx(crow, ccol, ccdata)
+            return row, col, data
         else:
             data = empty([len], dtype="double")
             numpy2c_double_inplace(data, &cdata, &n)
@@ -113,7 +117,11 @@ cdef class CSRMatrix(SparseMatrix):
         Returns (row, col, data) arrays.
         """
         cdef c_CSRMatrix *_thisptr = <c_CSRMatrix*>(self.thisptr)
-        return c2numpy_double_inplace(_thisptr.get_A(), _thisptr.get_nnz())
+        if self.thisptr.is_complex():
+            return c2numpy_double_complex_inplace(_thisptr.get_A_cplx(),
+                    _thisptr.get_nnz())
+        else:
+            return c2numpy_double_inplace(_thisptr.get_A(), _thisptr.get_nnz())
 
     def to_scipy_csr(self):
         """
@@ -163,7 +171,11 @@ cdef class CSCMatrix(SparseMatrix):
         Returns (row, col, data) arrays.
         """
         cdef c_CSCMatrix *_thisptr = <c_CSCMatrix*>(self.thisptr)
-        return c2numpy_double_inplace(_thisptr.get_A(), _thisptr.get_nnz())
+        if self.thisptr.is_complex():
+            return c2numpy_double_complex_inplace(_thisptr.get_A_cplx(),
+                    _thisptr.get_nnz())
+        else:
+            return c2numpy_double_inplace(_thisptr.get_A(), _thisptr.get_nnz())
 
     def to_scipy_csc(self):
         """
@@ -321,6 +333,13 @@ cdef api object c2numpy_double_inplace(double *A, int len):
     """
     cdef npy_intp dim = len
     return PyArray_SimpleNewFromData(1, &dim, NPY_DOUBLE, A)
+
+cdef api object c2numpy_double_complex_inplace(cplx *A, int len):
+    """
+    Construct the double NumPy array inplace (don't copy any data).
+    """
+    cdef npy_intp dim = len
+    return PyArray_SimpleNewFromData(1, &dim, NPY_COMPLEX128, A)
 
 _AA = None
 
