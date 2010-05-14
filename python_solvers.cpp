@@ -23,6 +23,22 @@ void solve_linear_system_numpy(Matrix *mat, double *res)
     delete p;
 }
 
+void solve_linear_system_numpy(Matrix *mat, cplx *res)
+{
+    CSRMatrix M(mat);
+    Python *p = new Python();
+    p->push("m", c2py_CSRMatrix(&M));
+    p->push("rhs", c2numpy_double_complex_inplace(res, mat->get_size()));
+    p->exec("A = m.to_scipy_csr().todense()");
+    p->exec("from numpy.linalg import solve");
+    p->exec("x = solve(A, rhs)");
+    cplx *x;
+    int n;
+    numpy2c_double_complex_inplace(p->pull("x"), &x, &n);
+    memcpy(res, x, n*sizeof(cplx));
+    delete p;
+}
+
 void solve_linear_system_scipy_umfpack(Matrix *mat, double *res)
 {
     CSCMatrix M(mat);

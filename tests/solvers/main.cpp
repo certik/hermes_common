@@ -180,19 +180,22 @@ void test_solver5()
 
     cplx res[5];
 
-    /*
     res[0] = cplx(8.);
     res[1] = cplx(45.);
     res[2] = cplx(-3.);
     res[3] = cplx(3.);
     res[4] = cplx(19.);
     solve_linear_system_numpy(&A, res);
-    _assert(fabs(res[0] - 1.) < EPS);
-    _assert(fabs(res[1] - 2.) < EPS);
-    _assert(fabs(res[2] - 3.) < EPS);
-    _assert(fabs(res[3] - 4.) < EPS);
-    _assert(fabs(res[4] - 5.) < EPS);
-    */
+    _assert(fabs(res[0].real() - 1.) < EPS);
+    _assert(fabs(res[1].real() - 2.) < EPS);
+    _assert(fabs(res[2].real() - 3.) < EPS);
+    _assert(fabs(res[3].real() - 4.) < EPS);
+    _assert(fabs(res[4].real() - 5.) < EPS);
+    _assert(fabs(res[0].imag() - 0.) < EPS);
+    _assert(fabs(res[1].imag() - 0.) < EPS);
+    _assert(fabs(res[2].imag() - 0.) < EPS);
+    _assert(fabs(res[3].imag() - 0.) < EPS);
+    _assert(fabs(res[4].imag() - 0.) < EPS);
 
     res[0] = cplx(8.);
     res[1] = cplx(45.);
