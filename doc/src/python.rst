@@ -1,0 +1,7 @@
+.. _python_doc:
+
+Python documentation
+====================
+
+This section documents the Python interface of hermes_common. If you want to use
+hermes_common from C++, see the :ref:`C++ documentation <cpp_doc>`.
