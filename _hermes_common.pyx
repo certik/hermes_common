@@ -19,20 +19,63 @@ cdef class Matrix:
     cdef c_Matrix *thisptr
 
     def get_size(self):
+        """
+        Returns the dimension of the square matrix.
+
+        Example::
+
+            >>> from _hermes_common import CooMatrix
+            >>> a = CooMatrix(5)
+            >>> a.get_size()
+            5
+
+        """
         return self.thisptr.get_size()
 
     def add(self, int m, int n, double v):
+        """
+        Adds the value ``v`` to self[m, n].
+
+        Example::
+
+            >>> from _hermes_common import CooMatrix
+            >>> a = CooMatrix(5)
+            >>> a.add(1, 3, 4.5)
+
+        """
         self.thisptr.add(m, n, v)
 
 cdef class SparseMatrix(Matrix):
     pass
 
 cdef class CooMatrix(SparseMatrix):
+    """
+    Represents a Coo matrix.
+
+    Example::
+
+        >>> from _hermes_common import CooMatrix
+        >>> a = CooMatrix(5)
+        >>> a.add(1, 3, 4.5)
+        >>> a.add(2, 3, 3.5)
+        >>> a.add(0, 2, 1.5)
+    """
 
     def __init__(self, size=0, is_complex=False):
         self.thisptr = <c_Matrix *>new_CooMatrix(size, is_complex)
 
     def add(self, int m, int n, v):
+        """
+        Adds the value ``v`` to self[m, n].
+
+        Example::
+
+            >>> from _hermes_common import CooMatrix
+            >>> a = CooMatrix(5)
+            >>> a.add(1, 3, 4.5)
+
+        """
+
         if self.thisptr.is_complex():
             self.thisptr.add_cplx(m, n, v)
         else:
@@ -42,6 +85,17 @@ cdef class CooMatrix(SparseMatrix):
     def row_col_data(self):
         """
         Returns (row, col, data) arrays.
+
+        Example::
+
+            >>> from _hermes_common import CooMatrix
+            >>> a = CooMatrix(5)
+            >>> a.add(1, 3, 4.5)
+            >>> a.add(2, 3, 3.5)
+            >>> a.add(0, 2, 1.5)
+            >>> a.row_col_data
+            (array([1, 2, 0], dtype=int32), array([3, 3, 2], dtype=int32), array([ 4.5,  3.5,  1.5]))
+
         """
         from numpy import empty
         cdef c_CooMatrix *_thisptr = <c_CooMatrix*>(self.thisptr)
@@ -71,6 +125,22 @@ cdef class CooMatrix(SparseMatrix):
     def to_scipy_coo(self):
         """
         Converts itself to the scipy sparse COO format.
+
+        Example::
+
+            >>> from _hermes_common import CooMatrix
+            >>> a = CooMatrix(5)
+            >>> a.add(1, 3, 4.5)
+            >>> a.add(2, 3, 3.5)
+            >>> a.add(0, 2, 1.5)
+            >>> a
+            <_hermes_common.CooMatrix object at 0x7f50d30d3108>
+            >>> a.to_scipy_coo()
+            <5x5 sparse matrix of type '<type 'numpy.float64'>'
+                with 3 stored elements in COOrdinate format>
+            >>> type(a.to_scipy_coo())
+            <class 'scipy.sparse.coo.coo_matrix'>
+
         """
         from scipy.sparse import coo_matrix
         row, col, data = self.row_col_data
@@ -81,6 +151,21 @@ cdef class CooMatrix(SparseMatrix):
         return str(self.to_scipy_coo())
 
 cdef class CSRMatrix(SparseMatrix):
+    """
+    Represents a CSR Matrix.
+
+    You have to create some other matrix first (in most cases Coo) and then
+    convert it.
+
+    Example::
+
+        >>> from _hermes_common import CooMatrix, CSRMatrix
+        >>> c = CooMatrix(5)
+        >>> c.add(2, 3, 1.5)
+        >>> c.add(1, 2, 2.5)
+        >>> m = CSRMatrix(c)
+
+    """
 
     def __init__(self, M):
         if isinstance(M, (int, long)):
@@ -135,6 +220,21 @@ cdef class CSRMatrix(SparseMatrix):
         return str(self.to_scipy_csr())
 
 cdef class CSCMatrix(SparseMatrix):
+    """
+    Represents a CSC Matrix.
+
+    You have to create some other matrix first (in most cases Coo) and then
+    convert it.
+
+    Example::
+
+        >>> from _hermes_common import CooMatrix, CSCMatrix
+        >>> c = CooMatrix(5)
+        >>> c.add(2, 3, 1.5)
+        >>> c.add(1, 2, 2.5)
+        >>> m = CSCMatrix(c)
+
+    """
 
     def __init__(self, M):
         if isinstance(M, (int, long)):
