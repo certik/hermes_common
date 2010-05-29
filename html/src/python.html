@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Python documentation &mdash; hermes_common v0.5 documentation</title>
+    <link rel="stylesheet" href="../static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../static/jquery.js"></script>
+    <script type="text/javascript" src="../static/doctools.js"></script>
+    <link rel="top" title="hermes_common v0.5 documentation" href="../index.html" />
+    <link rel="prev" title="C++ documentation" href="cpp.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="cpp.html" title="C++ documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">hermes_common v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-_hermes_common">
+<span id="python-doc"></span><h1>Python documentation<a class="headerlink" href="#module-_hermes_common" title="Permalink to this headline">¶</a></h1>
+<p>This section documents the Python interface of hermes_common. If you want to use
+hermes_common from C++, see the <a class="reference external" href="cpp.html#cpp-doc"><em>C++ documentation</em></a>.</p>
+<dl class="class">
+<dt id="_hermes_common.Matrix">
+<em class="property">class </em><tt class="descclassname">_hermes_common.</tt><tt class="descname">Matrix</tt><a class="headerlink" href="#_hermes_common.Matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="_hermes_common.Matrix.add">
+<tt class="descname">add</tt><big>(</big><big>)</big><a class="headerlink" href="#_hermes_common.Matrix.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the value <tt class="docutils literal"><span class="pre">v</span></tt> to self[m, n].</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">_hermes_common</span> <span class="k">import</span> <span class="n">CooMatrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CooMatrix</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="_hermes_common.Matrix.get_size">
+<tt class="descname">get_size</tt><big>(</big><big>)</big><a class="headerlink" href="#_hermes_common.Matrix.get_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dimension of the square matrix.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">_hermes_common</span> <span class="k">import</span> <span class="n">CooMatrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CooMatrix</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">get_size</span><span class="p">()</span>
+<span class="go">5</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="_hermes_common.SparseMatrix">
+<em class="property">class </em><tt class="descclassname">_hermes_common.</tt><tt class="descname">SparseMatrix</tt><a class="headerlink" href="#_hermes_common.SparseMatrix" title="Permalink to this definition">¶</a></dt>
+<dd>Bases: <a title="_hermes_common.Matrix" class="reference internal" href="#_hermes_common.Matrix"><tt class="xref docutils literal"><span class="pre">_hermes_common.Matrix</span></tt></a></dd></dl>
+
+<dl class="class">
+<dt id="_hermes_common.CooMatrix">
+<em class="property">class </em><tt class="descclassname">_hermes_common.</tt><tt class="descname">CooMatrix</tt><a class="headerlink" href="#_hermes_common.CooMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="_hermes_common.SparseMatrix" class="reference internal" href="#_hermes_common.SparseMatrix"><tt class="xref docutils literal"><span class="pre">_hermes_common.SparseMatrix</span></tt></a></p>
+<p>Represents a Coo matrix.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">_hermes_common</span> <span class="k">import</span> <span class="n">CooMatrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CooMatrix</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="_hermes_common.CooMatrix.add">
+<tt class="descname">add</tt><big>(</big><big>)</big><a class="headerlink" href="#_hermes_common.CooMatrix.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the value <tt class="docutils literal"><span class="pre">v</span></tt> to self[m, n].</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">_hermes_common</span> <span class="k">import</span> <span class="n">CooMatrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CooMatrix</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="_hermes_common.CooMatrix.row_col_data">
+<tt class="descname">row_col_data</tt><a class="headerlink" href="#_hermes_common.CooMatrix.row_col_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns (row, col, data) arrays.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">_hermes_common</span> <span class="k">import</span> <span class="n">CooMatrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CooMatrix</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">row_col_data</span>
+<span class="go">(array([1, 2, 0], dtype=int32), array([3, 3, 2], dtype=int32), array([ 4.5,  3.5,  1.5]))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="_hermes_common.CooMatrix.to_scipy_coo">
+<tt class="descname">to_scipy_coo</tt><big>(</big><big>)</big><a class="headerlink" href="#_hermes_common.CooMatrix.to_scipy_coo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts itself to the scipy sparse COO format.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">_hermes_common</span> <span class="k">import</span> <span class="n">CooMatrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CooMatrix</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span>
+<span class="go">&lt;_hermes_common.CooMatrix object at 0x7f50d30d3108&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">to_scipy_coo</span><span class="p">()</span>
+<span class="go">&lt;5x5 sparse matrix of type &#39;&lt;type &#39;numpy.float64&#39;&gt;&#39;</span>
+<span class="go">    with 3 stored elements in COOrdinate format&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">to_scipy_coo</span><span class="p">())</span>
+<span class="go">&lt;class &#39;scipy.sparse.coo.coo_matrix&#39;&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="_hermes_common.CSRMatrix">
+<em class="property">class </em><tt class="descclassname">_hermes_common.</tt><tt class="descname">CSRMatrix</tt><a class="headerlink" href="#_hermes_common.CSRMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="_hermes_common.SparseMatrix" class="reference internal" href="#_hermes_common.SparseMatrix"><tt class="xref docutils literal"><span class="pre">_hermes_common.SparseMatrix</span></tt></a></p>
+<p>Represents a CSR Matrix.</p>
+<p>You have to create some other matrix first (in most cases Coo) and then
+convert it.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">_hermes_common</span> <span class="k">import</span> <span class="n">CooMatrix</span><span class="p">,</span> <span class="n">CSRMatrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">CooMatrix</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">CSRMatrix</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="_hermes_common.CSRMatrix.A">
+<tt class="descname">A</tt><a class="headerlink" href="#_hermes_common.CSRMatrix.A" title="Permalink to this definition">¶</a></dt>
+<dd>Returns (row, col, data) arrays.</dd></dl>
+
+<dl class="attribute">
+<dt id="_hermes_common.CSRMatrix.IA">
+<tt class="descname">IA</tt><a class="headerlink" href="#_hermes_common.CSRMatrix.IA" title="Permalink to this definition">¶</a></dt>
+<dd>Returns (row, col, data) arrays.</dd></dl>
+
+<dl class="attribute">
+<dt id="_hermes_common.CSRMatrix.JA">
+<tt class="descname">JA</tt><a class="headerlink" href="#_hermes_common.CSRMatrix.JA" title="Permalink to this definition">¶</a></dt>
+<dd>Returns (row, col, data) arrays.</dd></dl>
+
+<dl class="method">
+<dt id="_hermes_common.CSRMatrix.to_scipy_csr">
+<tt class="descname">to_scipy_csr</tt><big>(</big><big>)</big><a class="headerlink" href="#_hermes_common.CSRMatrix.to_scipy_csr" title="Permalink to this definition">¶</a></dt>
+<dd>Converts itself to the scipy sparse CSR format.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="_hermes_common.CSCMatrix">
+<em class="property">class </em><tt class="descclassname">_hermes_common.</tt><tt class="descname">CSCMatrix</tt><a class="headerlink" href="#_hermes_common.CSCMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="_hermes_common.SparseMatrix" class="reference internal" href="#_hermes_common.SparseMatrix"><tt class="xref docutils literal"><span class="pre">_hermes_common.SparseMatrix</span></tt></a></p>
+<p>Represents a CSC Matrix.</p>
+<p>You have to create some other matrix first (in most cases Coo) and then
+convert it.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">_hermes_common</span> <span class="k">import</span> <span class="n">CooMatrix</span><span class="p">,</span> <span class="n">CSCMatrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">CooMatrix</span><span class="p">(</span><span class="mf">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">CSCMatrix</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="_hermes_common.CSCMatrix.A">
+<tt class="descname">A</tt><a class="headerlink" href="#_hermes_common.CSCMatrix.A" title="Permalink to this definition">¶</a></dt>
+<dd>Returns (row, col, data) arrays.</dd></dl>
+
+<dl class="attribute">
+<dt id="_hermes_common.CSCMatrix.IA">
+<tt class="descname">IA</tt><a class="headerlink" href="#_hermes_common.CSCMatrix.IA" title="Permalink to this definition">¶</a></dt>
+<dd>Returns (row, col, data) arrays.</dd></dl>
+
+<dl class="attribute">
+<dt id="_hermes_common.CSCMatrix.JA">
+<tt class="descname">JA</tt><a class="headerlink" href="#_hermes_common.CSCMatrix.JA" title="Permalink to this definition">¶</a></dt>
+<dd>Returns (row, col, data) arrays.</dd></dl>
+
+<dl class="method">
+<dt id="_hermes_common.CSCMatrix.to_scipy_csc">
+<tt class="descname">to_scipy_csc</tt><big>(</big><big>)</big><a class="headerlink" href="#_hermes_common.CSCMatrix.to_scipy_csc" title="Permalink to this definition">¶</a></dt>
+<dd>Converts itself to the scipy sparse CSC format.</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="cpp.html"
+                                  title="previous chapter">C++ documentation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../sources/src/python.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cpp.html" title="C++ documentation"
+             >previous</a> |</li>
+        <li><a href="../index.html">hermes_common v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, hp-FEM group at UNR.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+    </div>
+  </body>
+</html>
