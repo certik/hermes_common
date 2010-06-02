@@ -11,6 +11,11 @@ cdef inline char_p str2cp(object s) except ? NULL:
     if s is None: return NULL
     else:         return s
 
+cdef inline PY_NEW(T):
+    # The line below is roughly equivalent to "return T()", except that the
+    # "__init__()" function is not being called:
+    return (<RichPyTypeObject*>T).tp_new((<RichPyTypeObject*>T), (), NULL)
+
 
 #-----------------------------------------------------------------------
 # Matrix classes:
@@ -527,8 +532,3 @@ cdef api void run_cmd(const_char_p text, object namespace):
         s = "".join(traceback.format_exception(etype, value, tb))
         s = "Exception raised in the Python code:\n" + s
         throw_exception(s)
-
-def init_hermes2d_wrappers():
-    init_global_empty_tuple()
-
-init_global_empty_tuple()
