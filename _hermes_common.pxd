@@ -102,8 +102,8 @@ cdef extern from "matrix.h":
 
     cdef struct c_CSRMatrix "CSRMatrix":
         CSRMatrix(int size)
-        int *get_IA()
-        int *get_JA()
+        int *get_Ap()
+        int *get_Ai()
         double *get_A()
         cplx *get_A_cplx()
         int get_nnz()
@@ -113,8 +113,8 @@ cdef extern from "matrix.h":
 
     cdef struct c_CSCMatrix "CSCMatrix":
         CSCMatrix(int size)
-        int *get_IA()
-        int *get_JA()
+        int *get_Ap()
+        int *get_Ai()
         double *get_A()
         cplx *get_A_cplx()
         int get_nnz()
@@ -127,3 +127,4 @@ cdef api object c2numpy_int(int *A, int len)
 cdef api object c2numpy_double(double *A, int len)
 
 cdef inline PY_NEW(T)
+

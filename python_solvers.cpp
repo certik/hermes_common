@@ -4,7 +4,9 @@
 // Email: hermes1d@googlegroups.com, home page: http://hpfem.org/
 
 #include "matrix.h"
+#include "solvers.h"
 
+#ifdef H2D_COMMON_WITH_SCIPY
 #include "python_api.h"
 
 void solve_linear_system_numpy(Matrix *mat, double *res)
@@ -102,3 +104,34 @@ void solve_linear_system_scipy_gmres(Matrix *mat, double *res)
     memcpy(res, x, n*sizeof(double));
     delete p;
 }
+
+#else
+
+void solve_linear_system_numpy(Matrix *mat, double *res)
+{
+    _error("hermes_common: solve_linear_system_numpy - NUMPY is not available.");
+}
+void solve_linear_system_numpy(Matrix *mat, cplx *res)
+{
+    _error("hermes_common: solve_linear_system_numpy - NUMPY is not available.");
+}
+void solve_linear_system_scipy_umfpack(Matrix *mat, double *res)
+{
+    _error("hermes_common: solve_linear_system_scipy_umfpack - SCIPY is not available.");
+}
+
+void solve_linear_system_scipy_umfpack(Matrix *mat, cplx *res)
+{
+    _error("hermes_common: solve_linear_system_scipy_umfpack - SCIPY is not available.");
+}
+
+void solve_linear_system_scipy_cg(Matrix *mat, double *res)
+{
+    _error("hermes_common: solve_linear_system_scipy_cg - SCIPY is not available.");
+}
+
+void solve_linear_system_scipy_gmres(Matrix *mat, double *res)
+{
+    _error("hermes_common: solve_linear_system_scipy_gmres - SCIPY is not available.");
+}
+#endif

@@ -191,7 +191,7 @@ cdef class CSRMatrix(SparseMatrix):
         Returns (row, col, data) arrays.
         """
         cdef c_CSRMatrix *_thisptr = <c_CSRMatrix*>(self.thisptr)
-        return c2numpy_int_inplace(_thisptr.get_IA(), self.get_size()+1)
+        return c2numpy_int_inplace(_thisptr.get_Ap(), self.get_size()+1)
 
     @property
     def JA(self):
@@ -199,7 +199,7 @@ cdef class CSRMatrix(SparseMatrix):
         Returns (row, col, data) arrays.
         """
         cdef c_CSRMatrix *_thisptr = <c_CSRMatrix*>(self.thisptr)
-        return c2numpy_int_inplace(_thisptr.get_JA(), _thisptr.get_nnz())
+        return c2numpy_int_inplace(_thisptr.get_Ai(), _thisptr.get_nnz())
 
     @property
     def A(self):
@@ -260,7 +260,7 @@ cdef class CSCMatrix(SparseMatrix):
         Returns (row, col, data) arrays.
         """
         cdef c_CSCMatrix *_thisptr = <c_CSCMatrix*>(self.thisptr)
-        return c2numpy_int_inplace(_thisptr.get_IA(), _thisptr.get_nnz())
+        return c2numpy_int_inplace(_thisptr.get_Ai(), _thisptr.get_nnz())
 
     @property
     def JA(self):
@@ -268,7 +268,7 @@ cdef class CSCMatrix(SparseMatrix):
         Returns (row, col, data) arrays.
         """
         cdef c_CSCMatrix *_thisptr = <c_CSCMatrix*>(self.thisptr)
-        return c2numpy_int_inplace(_thisptr.get_JA(), self.get_size()+1)
+        return c2numpy_int_inplace(_thisptr.get_Ap(), self.get_size()+1)
 
     @property
     def A(self):
@@ -532,3 +532,4 @@ cdef api void run_cmd(const_char_p text, object namespace):
         s = "".join(traceback.format_exception(etype, value, tb))
         s = "Exception raised in the Python code:\n" + s
         throw_exception(s)
+
