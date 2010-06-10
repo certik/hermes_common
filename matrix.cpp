@@ -61,17 +61,6 @@ void transpose(T** matrix, int m, int n)
                 matrix[j][i] = matrix[i][j];
 }
 
-
-
-
-Matrix::Matrix()
-{
-}
-
-Matrix::~Matrix()
-{
-}
-
 // *********************************************************************************************************************
 
 void CooMatrix::print()
@@ -94,26 +83,30 @@ void CooMatrix::print()
 
 // *********************************************************************************************************************
 
-CSRMatrix::CSRMatrix(Matrix *m):Matrix() {
+CSRMatrix::CSRMatrix(Matrix *m) : Matrix()
+{
     init();
 
     if (dynamic_cast<CooMatrix*>(m))
-        this->add_from_CooMatrix((CooMatrix*)m);
+        this->add_from_coo((CooMatrix*)m);
     else if (dynamic_cast<CSCMatrix*>(m))
-        this->add_from_CSCMatrix((CSCMatrix*)m);
+        this->add_from_csc((CSCMatrix*)m);
     else if (dynamic_cast<DenseMatrix*>(m))
-        this->add_from_DenseMatrix((DenseMatrix*)m);
+        this->add_from_dense((DenseMatrix*)m);
     else
         _error("Matrix type not supported.");
 }
 
-void CSRMatrix::add_from_DenseMatrix(DenseMatrix *m) {
+void CSRMatrix::add_from_dense(DenseMatrix *m)
+{
     this->size = m->get_size();
 
     // count nnz
     this->nnz = 0;
-    for(int i = 0; i < this->size; i++) {
-        for(int j = 0; j < this->size; j++) {
+    for(int i = 0; i < this->size; i++)
+    {
+        for(int j = 0; j < this->size; j++)
+        {
             double v = m->get(i, j);
             if (fabs(v) > 1e-12)
                 this->nnz++;
@@ -127,10 +120,13 @@ void CSRMatrix::add_from_DenseMatrix(DenseMatrix *m) {
 
     int count = 0;
     this->Ap[0] = 0;
-    for(int i = 0; i < this->size; i++) {
-        for(int j = 0; j < this->size; j++) {
+    for(int i = 0; i < this->size; i++)
+    {
+        for(int j = 0; j < this->size; j++)
+        {
             double v = m->get(i, j);
-            if (fabs(v) > 1e-12) {
+            if (fabs(v) > 1e-12)
+            {
                 this->A[count] = v;
                 this->Ai[count] = j;
                 count++;
@@ -140,7 +136,7 @@ void CSRMatrix::add_from_DenseMatrix(DenseMatrix *m) {
     }
 }
 
-void CSRMatrix::add_from_CooMatrix(CooMatrix *m)
+void CSRMatrix::add_from_coo(CooMatrix *m)
 {
     this->size = m->get_size();
     this->nnz = m->is_complex() ? m->triplets_len_cplx() : m->triplets_len();
@@ -149,70 +145,25 @@ void CSRMatrix::add_from_CooMatrix(CooMatrix *m)
     // allocate data
     free_data();
 
-    this->Ap = new int[this->size+1];
+    this->Ap = new int[this->size + 1];
     this->Ai = new int[this->nnz];
-    if (is_complex())
-        this->A_cplx = new cplx[this->nnz];
-    else
-        this->A = new double[this->nnz];
+    this->A = new double[this->nnz];
 
     // get data
     int *row = new int[nnz];
     int *col = new int[nnz];
-    double *data = NULL;
-    cplx *data_cplx = NULL;
+    double *data = new double[nnz];
+    m->get_row_col_data(row, col, data);
 
-    if (is_complex()) {
-        data_cplx = new cplx[nnz];
-        m->get_row_col_data(row, col, data_cplx);
-    } else {
-        data = new double[nnz];
-        m->get_row_col_data(row, col, data);
-    }
-
-    // compute number of non-zero entries per row of A
-    std::fill(this->Ap, this->Ap + this->size, 0);
-
-    for (int n = 0; n < nnz; n++) {
-        this->Ap[row[n]]++;
-    }
-
-    // cumsum the nnz per row to get this->row_ptr[]
-    for(int i = 0, cumsum = 0; i < this->size; i++){
-        int temp = this->Ap[i];
-        this->Ap[i] = cumsum;
-        cumsum += temp;
-    }
-    this->Ap[this->size] = nnz;
-
-    // write Aj,Ax into Bj,Bx
-    for(int n = 0; n < nnz; n++){
-        int index  = row[n];
-        int dest = this->Ap[index];
-
-        this->Ai[dest] = col[n];
-        if (is_complex())
-            this->A_cplx[dest] = data_cplx[n];
-        else
-            this->A[dest] = data[n];
-
-        this->Ap[index]++;
-    }
-
-    for(int i = 0, last = 0; i <= this->size; i++){
-        int temp = this->Ap[i];
-        this->Ap[i]  = last;
-        last   = temp;
-    }
+    coo_to_csr(this->size, this->nnz, row, col, data, Ap, Ai, A);
 
     // free data
-    delete[] row;
-    delete[] col;
+    if (row) delete[] row;
+    if (col) delete[] col;
     if (data) delete[] data;
-    if (data_cplx) delete[] data_cplx;
 }
 
-void CSRMatrix::add_from_CSCMatrix(CSCMatrix *m)
+void CSRMatrix::add_from_csc(CSCMatrix *m)
 {
     _error("internal error: CSRMatrix::add_from_CSCMatrix(CSCMatrix *m) not implemented.");
 }
@@ -233,7 +184,19 @@ void CSRMatrix::print()
 
 // *********************************************************************************************************************
 
-void CSCMatrix::add_from_CooMatrix(CooMatrix *m)
+CSCMatrix::CSCMatrix(Matrix *m) : Matrix()
+{
+    init();
+
+    if (dynamic_cast<CooMatrix*>(m))
+        this->add_from_coo((CooMatrix *) m);
+    else if (dynamic_cast<CSRMatrix *>(m))
+        this->add_from_csr((CSRMatrix *) m);
+    else
+        _error("Matrix type not supported.");
+}
+
+void CSCMatrix::add_from_coo(CooMatrix *m)
 {
     this->size = m->get_size();
     this->nnz = m->is_complex() ? m->triplets_len_cplx() : m->triplets_len();
@@ -242,70 +205,25 @@ void CSCMatrix::add_from_CooMatrix(CooMatrix *m)
     // allocate data
     free_data();
 
-    this->Ap = new int[this->size+1];
+    this->Ap = new int[this->size + 1];
     this->Ai = new int[this->nnz];
-    if (is_complex())
-        this->A_cplx = new cplx[this->nnz];
-    else
-        this->A = new double[this->nnz];
+    this->A = new double[this->nnz];
 
     // get data
     int *row = new int[nnz];
     int *col = new int[nnz];
-    double *data = NULL;
-    cplx *data_cplx = NULL;
+    double *data = new double[nnz];
+    m->get_row_col_data(row, col, data);
 
-    if (is_complex()) {
-        data_cplx = new cplx[nnz];
-        m->get_row_col_data(col, row, data_cplx);
-    } else {
-        data = new double[nnz];
-        m->get_row_col_data(col, row, data);
-    }
-
-    // compute number of non-zero entries per row of A
-    std::fill(this->Ap, this->Ap + this->size, 0);
-
-    for (int n = 0; n < nnz; n++) {
-        this->Ap[row[n]]++;
-    }
-
-    // cumsum the nnz per row to get this->row_ptr[]
-    for(int i = 0, cumsum = 0; i < this->size; i++){
-        int temp = this->Ap[i];
-        this->Ap[i] = cumsum;
-        cumsum += temp;
-    }
-    this->Ap[this->size] = nnz;
-
-    // write Aj, Ax into Bj, Bx
-    for(int n = 0; n < nnz; n++){
-        int index  = row[n];
-        int dest = this->Ap[index];
-
-        this->Ai[dest] = col[n];
-        if (is_complex())
-            this->A_cplx[dest] = data_cplx[n];
-        else
-            this->A[dest] = data[n];
-
-        this->Ap[index]++;
-    }
-
-    for(int i = 0, last = 0; i <= this->size; i++){
-        int temp = this->Ap[i];
-        this->Ap[i]  = last;
-        last   = temp;
-    }
+    coo_to_csc(this->size, this->nnz, row, col, data, Ap, Ai, A);
 
     // free data
-    delete[] row;
-    delete[] col;
+    if (row) delete[] row;
+    if (col) delete[] col;
     if (data) delete[] data;
-    if (data_cplx) delete[] data_cplx;
 }
 
-void CSCMatrix::add_from_CSRMatrix(CSRMatrix *m)
+void CSCMatrix::add_from_csr(CSRMatrix *m)
 {
     _error("internal error: CSRMatrix::add_from_CSCMatrix(CSCMatrix *m) not implemented.");
     /*
@@ -387,19 +305,81 @@ void CSCMatrix::print()
         print_vector("data", this->A, this->nnz);
 }
 
-template <> Triple<cplx> *CooMatrix::get_list<cplx>() {
+template <> Triple<cplx> *CooMatrix::get_list<cplx>()
+{
     return this->list_cplx;
 }
 
-void CooMatrix::set_zero() {
-    if (this->_is_complex) {
+void CooMatrix::set_zero()
+{
+    if (this->_is_complex)
+    {
         this->free_data<cplx>();
         this->list_cplx = NULL;
         this->list_last_cplx = NULL;
-    } else {
+    }
+    else
+    {
         this->free_data<double>();
         this->list = NULL;
         this->list_last = NULL;
     }
     this->size = 0;
 }
+
+// ******************************************************************************************************************************
+
+void coo_to_csr(int size, int nnz, int *row, int *col, double *A, int *Ap, int *Ai, double *Ax)
+{
+    // compute number of non-zero entries per row of A
+    std::fill(Ap, Ap + size, 0);
+
+    for (int n = 0; n < nnz; n++)
+    {
+        Ap[row[n]]++;
+    }
+
+    // cumsum the nnz per row to get this->row_ptr[]
+    for(int i = 0, cumsum = 0; i < size; i++)
+    {
+        int temp = Ap[i];
+        Ap[i] = cumsum;
+        cumsum += temp;
+    }
+    Ap[size] = nnz;
+
+    // write Aj, Ax into Bj, Bx
+    for(int n = 0; n < nnz; n++)
+    {
+        int index  = row[n];
+        int dest = Ap[index];
+
+        Ai[dest] = col[n];
+        Ax[dest] = A[n];
+
+        Ap[index]++;
+    }
+
+    for(int i = 0, last = 0; i <= size; i++)
+    {
+        int temp = Ap[i];
+        Ap[i]  = last;
+        last   = temp;
+    }
+}
+
+void coo_to_csc(int size, int nnz, int *row, int *col, double *A, int *Ap, int *Ai, double *Ax)
+{
+    coo_to_csr(size, nnz, col, row, A, Ap, Ai, Ax);
+}
+
+void csr_to_csc(int size, int nnz, int *Arp, int *Ari, double *Arx, int *Acp, int *Aci, double *Acx)
+{
+
+}
+
+void csc_to_csr(int size, int nnz, int *Arp, int *Ari, double *Arx, int *Acp, int *Aci, double *Acx)
+{
+
+}
+

@@ -6,7 +6,7 @@
 #include "matrix.h"
 #include "solvers.h"
 
-#ifdef H2D_COMMON_WITH_SCIPY
+#ifdef COMMON_WITH_SCIPY
 #include "python_api.h"
 
 void solve_linear_system_numpy(Matrix *mat, double *res)
