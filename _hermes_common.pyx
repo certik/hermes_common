@@ -108,10 +108,7 @@ cdef class CooMatrix(SparseMatrix):
         cdef int *crow, *ccol
         cdef double *cdata
         cdef cplx *ccdata
-        if self.thisptr.is_complex():
-            len = _thisptr.triplets_len_cplx()
-        else:
-            len = _thisptr.triplets_len()
+        len = _thisptr.get_nnz()
         row = empty([len], dtype="int32")
         numpy2c_int_inplace(row, &crow, &n)
         col = empty([len], dtype="int32")
@@ -208,10 +205,10 @@ cdef class CSRMatrix(SparseMatrix):
         """
         cdef c_CSRMatrix *_thisptr = <c_CSRMatrix*>(self.thisptr)
         if self.thisptr.is_complex():
-            return c2numpy_double_complex_inplace(_thisptr.get_A_cplx(),
+            return c2numpy_double_complex_inplace(_thisptr.get_Ax_cplx(),
                     _thisptr.get_nnz())
         else:
-            return c2numpy_double_inplace(_thisptr.get_A(), _thisptr.get_nnz())
+            return c2numpy_double_inplace(_thisptr.get_Ax(), _thisptr.get_nnz())
 
     def to_scipy_csr(self):
         """
@@ -277,10 +274,10 @@ cdef class CSCMatrix(SparseMatrix):
         """
         cdef c_CSCMatrix *_thisptr = <c_CSCMatrix*>(self.thisptr)
         if self.thisptr.is_complex():
-            return c2numpy_double_complex_inplace(_thisptr.get_A_cplx(),
+            return c2numpy_double_complex_inplace(_thisptr.get_Ax_cplx(),
                     _thisptr.get_nnz())
         else:
-            return c2numpy_double_inplace(_thisptr.get_A(), _thisptr.get_nnz())
+            return c2numpy_double_inplace(_thisptr.get_Ax(), _thisptr.get_nnz())
 
     def to_scipy_csc(self):
         """

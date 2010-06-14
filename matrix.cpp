@@ -63,20 +63,196 @@ void transpose(T** matrix, int m, int n)
 
 // *********************************************************************************************************************
 
+void CooMatrix::free_data()
+{
+    // for(std::map<size_t, std::map<size_t, double> >::const_iterator it_row = A.begin(); it_row != A.end(); ++it_row)
+    //     it_row->second.clear();
+    A.clear();
+
+    // for(std::map<size_t, std::map<size_t, cplx> >::const_iterator it_row = A_cplx.begin(); it_row != A_cplx.end(); ++it_row)
+    //    it_row->second.clear();
+    A_cplx.clear();
+}
+
+void CooMatrix::add(int m, int n, double v)
+{
+    if (this->_is_complex)
+        _error("can't use add(int, int, double) for complex matrix");
+
+    // adjusting size if necessary
+    if (m+1 > this->size) this->size = m+1;
+    if (n+1 > this->size) this->size = n+1;
+
+    // debug
+    if (DEBUG_MATRIX) {
+        printf("Matrix_add %d %d %g -> size = %d\n", m, n, v, this->size);
+    }
+
+    // add new
+    A[m][n] += v;
+}
+
+void CooMatrix::add(int m, int n, cplx v)
+{
+    if (!(this->_is_complex))
+        _error("can't use add(int, int, cplx) for real matrix");
+
+    // adjusting size if necessary
+    if (m+1 > this->size) this->size = m+1;
+    if (n+1 > this->size) this->size = n+1;
+
+    A_cplx[m][n] += v;
+}
+
+void CooMatrix::copy_into(Matrix *m)
+{
+    m->set_zero();
+
+    int index = 0;
+    if (this->_is_complex)
+    {
+        for(std::map<size_t, std::map<size_t, cplx> >::const_iterator it_row = A_cplx.begin(); it_row != A_cplx.end(); ++it_row)
+        {
+            for(std::map<size_t, cplx>::const_iterator it_col = it_row->second.begin(); it_col != it_row->second.end(); ++it_col)
+            {
+                m->add(it_row->first,
+                       it_col->first,
+                       cplx(it_col->second.real(), it_col->second.imag()));
+
+                index++;
+            }
+        }
+    }
+    else
+    {
+        for(std::map<size_t, std::map<size_t, double> >::const_iterator it_row = A.begin(); it_row != A.end(); ++it_row)
+        {
+            for(std::map<size_t, double>::const_iterator it_col = it_row->second.begin(); it_col != it_row->second.end(); ++it_col)
+            {
+                m->add(it_row->first,
+                       it_col->first,
+                       it_col->second);
+
+                index++;
+            }
+        }
+    }
+}
+
+void CooMatrix::get_row_col_data(int *row, int *col, double *data)
+{
+    int index = 0;
+    for(std::map<size_t, std::map<size_t, double> >::const_iterator it_row = A.begin(); it_row != A.end(); ++it_row)
+    {
+        for(std::map<size_t, double>::const_iterator it_col = it_row->second.begin(); it_col != it_row->second.end(); ++it_col)
+        {
+            row[index] = it_row->first;
+            col[index] = it_col->first;
+            data[index] = it_col->second;
+
+            index++;
+        }
+    }
+}
+
+void CooMatrix::get_row_col_data(int *row, int *col, cplx *data)
+{
+    int index = 0;
+    for(std::map<size_t, std::map<size_t, cplx> >::const_iterator it_row = A_cplx.begin(); it_row != A_cplx.end(); ++it_row)
+    {
+        for(std::map<size_t, cplx>::const_iterator it_col = it_row->second.begin(); it_col != it_row->second.end(); ++it_col)
+        {
+            row[index] = it_row->first;
+            col[index] = it_col->first;
+            data[index] = it_col->second;
+
+            index++;
+        }
+    }
+}
+
+void CooMatrix::get_row_col_data(int *row, int *col, double *data_real, double *data_imag)
+{
+    int index = 0;
+    for(std::map<size_t, std::map<size_t, cplx> >::const_iterator it_row = A_cplx.begin(); it_row != A_cplx.end(); ++it_row)
+    {
+        for(std::map<size_t, cplx>::const_iterator it_col = it_row->second.begin(); it_col != it_row->second.end(); ++it_col)
+        {
+            row[index] = it_row->first;
+            col[index] = it_col->first;
+            data_real[index] = it_col->second.real();
+            data_imag[index] = it_col->second.imag();
+
+            index++;
+        }
+    }
+}
+
+int CooMatrix::get_nnz()
+{
+    int nnz = 0;
+    if (_is_complex)
+        for(std::map<size_t, std::map<size_t, cplx> >::const_iterator it_row = A_cplx.begin(); it_row != A_cplx.end(); ++it_row)
+            nnz += it_row->second.size();
+    else
+        for(std::map<size_t, std::map<size_t, double> >::const_iterator it_row = A.begin(); it_row != A.end(); ++it_row)
+            nnz += it_row->second.size();
+
+    return nnz;
+}
+
+void CooMatrix::times_vector(double* vec, double* result, int rank)
+{
+    int index = 0;
+    for(std::map<size_t, std::map<size_t, double> >::const_iterator it_row = A.begin(); it_row != A.end(); ++it_row)
+    {
+        for(std::map<size_t, double>::const_iterator it_col = it_row->second.begin(); it_col != it_row->second.end(); ++it_col)
+        {
+            result[index] += it_col->second * vec[index];
+            index++;
+        }
+    }
+}
+
+void CooMatrix::set_zero()
+{
+    if (this->_is_complex)
+        A_cplx.clear();
+    else
+        A.clear();
+
+    this->size = 0;
+}
+
 void CooMatrix::print()
 {
     printf("\nCoo Matrix:\n");
-    if (is_complex()) {
-        Triple<cplx> *t = this->list_cplx;
-        while (t != NULL) {
-            printf("(%i, %i): (%f, %f) \n", t->i, t->j, t->v.real(), t->v.imag());
-            t = t->next;
+
+    if (is_complex())
+    {
+        for(std::map<size_t, std::map<size_t, cplx> >::const_iterator it_row = A_cplx.begin(); it_row != A_cplx.end(); ++it_row)
+        {
+            for(std::map<size_t, cplx>::const_iterator it_col = it_row->second.begin(); it_col != it_row->second.end(); ++it_col)
+            {
+                printf("(%lu, %lu): (%f, %f)\n",
+                       it_row->first,
+                       it_col->first,
+                       ((cplx) it_col->second).real(),
+                       ((cplx) it_col->second).imag());
+            }
         }
-    } else {
-        Triple<double> *t = this->list;
-        while (t != NULL) {
-            printf("(%i, %i): %f\n", t->i, t->j, t->v);
-            t = t->next;
+    }
+    else
+    {
+        for(std::map<size_t, std::map<size_t, double> >::const_iterator it_row = A.begin(); it_row != A.end(); ++it_row)
+        {
+            for(std::map<size_t, double>::const_iterator it_col = it_row->second.begin(); it_col != it_row->second.end(); ++it_col)
+            {
+                printf("(%lu, %lu): %f\n",
+                       it_row->first,
+                       it_col->first,
+                       it_col->second);
+            }
         }
     }
 }
@@ -114,7 +290,7 @@ void CSRMatrix::add_from_dense(DenseMatrix *m)
     }
 
     // allocate arrays
-    this->A = new double[this->nnz];
+    this->Ax = new double[this->nnz];
     this->Ap = new int[this->size+1];
     this->Ai = new int[this->nnz];
 
@@ -127,7 +303,7 @@ void CSRMatrix::add_from_dense(DenseMatrix *m)
             double v = m->get(i, j);
             if (fabs(v) > 1e-12)
             {
-                this->A[count] = v;
+                this->Ax[count] = v;
                 this->Ai[count] = j;
                 count++;
             }
@@ -139,7 +315,7 @@ void CSRMatrix::add_from_dense(DenseMatrix *m)
 void CSRMatrix::add_from_coo(CooMatrix *m)
 {
     this->size = m->get_size();
-    this->nnz = m->is_complex() ? m->triplets_len_cplx() : m->triplets_len();
+    this->nnz = m->get_nnz();
     this->_is_complex = m->is_complex();
 
     // allocate data
@@ -147,25 +323,58 @@ void CSRMatrix::add_from_coo(CooMatrix *m)
 
     this->Ap = new int[this->size + 1];
     this->Ai = new int[this->nnz];
-    this->A = new double[this->nnz];
+    if (is_complex())
+        this->Ax_cplx = new cplx[this->nnz];
+    else
+        this->Ax = new double[this->nnz];
 
     // get data
-    int *row = new int[nnz];
-    int *col = new int[nnz];
-    double *data = new double[nnz];
-    m->get_row_col_data(row, col, data);
-
-    coo_to_csr(this->size, this->nnz, row, col, data, Ap, Ai, A);
+    int *row = new int[this->nnz];
+    int *col = new int[this->nnz];
+    if (is_complex())
+    {
+        cplx *data = new cplx[this->nnz];
+        m->get_row_col_data(row, col, data);
+        coo_to_csr(this->size, this->nnz, row, col, data, Ap, Ai, Ax_cplx);
+        if (data) delete[] data;
+    }
+    else
+    {
+        double *data = new double[this->nnz];
+        m->get_row_col_data(row, col, data);
+        coo_to_csr(this->size, this->nnz, row, col, data, Ap, Ai, Ax);
+        if (data) delete[] data;
+    }
 
     // free data
     if (row) delete[] row;
     if (col) delete[] col;
-    if (data) delete[] data;
 }
 
 void CSRMatrix::add_from_csc(CSCMatrix *m)
 {
-    _error("internal error: CSRMatrix::add_from_CSCMatrix(CSCMatrix *m) not implemented.");
+    this->size = m->get_size();
+    this->nnz = m->get_nnz();
+    this->_is_complex = m->is_complex();
+
+    // allocate data
+    free_data();
+
+    this->Ap = new int[this->size + 1];
+    this->Ai = new int[this->nnz];
+    if (is_complex())
+        this->Ax_cplx = new cplx[this->nnz];
+    else
+        this->Ax = new double[this->nnz];
+
+    if (is_complex())
+    {
+        csc_to_csr(this->size, this->nnz, m->get_Ap(), m->get_Ai(), m->get_Ax_cplx(), Ap, Ai, Ax_cplx);
+    }
+    else
+    {
+        csc_to_csr(this->size, this->nnz, m->get_Ap(), m->get_Ai(), m->get_Ax(), Ap, Ai, Ax);
+    }
 }
 
 void CSRMatrix::print()
@@ -177,9 +386,9 @@ void CSRMatrix::print()
     print_vector("row_ptr", this->Ap, this->size+1);
     print_vector("col_ind", this->Ai, this->nnz);
     if (is_complex())
-        print_vector("data", this->A_cplx, this->nnz);
+        print_vector("data", this->Ax_cplx, this->nnz);
     else
-        print_vector("data", this->A, this->nnz);
+        print_vector("data", this->Ax, this->nnz);
 }
 
 // *********************************************************************************************************************
@@ -199,7 +408,7 @@ CSCMatrix::CSCMatrix(Matrix *m) : Matrix()
 void CSCMatrix::add_from_coo(CooMatrix *m)
 {
     this->size = m->get_size();
-    this->nnz = m->is_complex() ? m->triplets_len_cplx() : m->triplets_len();
+    this->nnz = m->get_nnz();
     this->_is_complex = m->is_complex();
 
     // allocate data
@@ -207,26 +416,36 @@ void CSCMatrix::add_from_coo(CooMatrix *m)
 
     this->Ap = new int[this->size + 1];
     this->Ai = new int[this->nnz];
-    this->A = new double[this->nnz];
+    if (is_complex())
+        this->Ax_cplx = new cplx[this->nnz];
+    else
+        this->Ax = new double[this->nnz];
 
     // get data
-    int *row = new int[nnz];
-    int *col = new int[nnz];
-    double *data = new double[nnz];
-    m->get_row_col_data(row, col, data);
-
-    coo_to_csc(this->size, this->nnz, row, col, data, Ap, Ai, A);
+    int *row = new int[this->nnz];
+    int *col = new int[this->nnz];
+    if (is_complex())
+    {
+        cplx *data = new cplx[this->nnz];
+        m->get_row_col_data(row, col, data);
+        coo_to_csc(this->size, this->nnz, row, col, data, Ap, Ai, Ax_cplx);
+        if (data) delete[] data;
+    }
+    else
+    {
+        double *data = new double[this->nnz];
+        m->get_row_col_data(row, col, data);
+        coo_to_csc(this->size, this->nnz, row, col, data, Ap, Ai, Ax);
+        if (data) delete[] data;
+    }
 
     // free data
     if (row) delete[] row;
     if (col) delete[] col;
-    if (data) delete[] data;
 }
 
 void CSCMatrix::add_from_csr(CSRMatrix *m)
 {
-    _error("internal error: CSRMatrix::add_from_CSCMatrix(CSCMatrix *m) not implemented.");
-    /*
     this->size = m->get_size();
     this->nnz = m->get_nnz();
     this->_is_complex = m->is_complex();
@@ -234,61 +453,21 @@ void CSCMatrix::add_from_csr(CSRMatrix *m)
     // allocate data
     free_data();
 
-    this->Ap = new int[this->size+1];
+    this->Ap = new int[this->size + 1];
     this->Ai = new int[this->nnz];
     if (is_complex())
-        this->A_cplx = new cplx[this->nnz];
+        this->Ax_cplx = new cplx[this->nnz];
     else
-        this->A = new double[this->nnz];
+        this->Ax = new double[this->nnz];
 
-    // get data
-    int *row = m->get_Ap();
-    int *col = m->get_Ai();
-    double *data = NULL;
-    cplx *data_cplx = NULL;
-
-    if (is_complex()) {
-        data_cplx = m->get_A_cplx();
-    } else {
-        data = m->get_A();
+    if (is_complex())
+    {
+        csr_to_csc(this->size, this->nnz, m->get_Ap(), m->get_Ai(), m->get_Ax_cplx(), Ap, Ai, Ax_cplx);
     }
-
-    //compute number of non-zero entries per column of A
-    std::fill(this->Ap, this->Ap + this->size, 0);
-
-    for (int n = 0; n < nnz; n++){
-        this->Ap[this->Ai[n]]++;
+    else
+    {
+        csr_to_csc(this->size, this->nnz, m->get_Ap(), m->get_Ai(), m->get_Ax(), Ap, Ai, Ax);
     }
-
-    //cumsum the nnz per column to get Bp[]
-    for(int col = 0, cumsum = 0; col < this->size; col++){
-        int temp  = this->Ap[col];
-        this->Ap[col] = cumsum;
-        cumsum += temp;
-    }
-    this->Ap[this->size] = nnz;
-
-    for(int l = 0; l < this->size; l++){
-        for(int jj = row[l]; jj < row[l+1]; jj++){
-            int temp  = col[jj];
-            int dest = this->Ap[temp];
-
-            this->Ai[dest] = l;
-            if (is_complex())
-                this->A_cplx[dest] = data_cplx[jj];
-            else
-                this->A[dest] = data[jj];
-
-            this->Ap[temp]++;
-        }
-    }
-
-    for(int l = 0, last = 0; l <= this->size; l++){
-        int temp = this->Ap[l];
-        this->Ap[l] = last;
-        last = temp;
-    }
-    */
 }
 
 void CSCMatrix::print()
@@ -300,38 +479,16 @@ void CSCMatrix::print()
     print_vector("col_ptr", this->Ap, this->size+1);
     print_vector("row_ind", this->Ai, this->nnz);
     if (is_complex())
-        print_vector("data", this->A_cplx, this->nnz);
+        print_vector("data", this->Ax_cplx, this->nnz);
     else
-        print_vector("data", this->A, this->nnz);
-}
-
-template <> Triple<cplx> *CooMatrix::get_list<cplx>()
-{
-    return this->list_cplx;
-}
-
-void CooMatrix::set_zero()
-{
-    if (this->_is_complex)
-    {
-        this->free_data<cplx>();
-        this->list_cplx = NULL;
-        this->list_last_cplx = NULL;
-    }
-    else
-    {
-        this->free_data<double>();
-        this->list = NULL;
-        this->list_last = NULL;
-    }
-    this->size = 0;
+        print_vector("data", this->Ax, this->nnz);
 }
 
 // ******************************************************************************************************************************
 
-void coo_to_csr(int size, int nnz, int *row, int *col, double *A, int *Ap, int *Ai, double *Ax)
+template<typename T>
+void coo_to_csr(int size, int nnz, int *row, int *col, T *A, int *Ap, int *Ai, T *Ax)
 {
-    // compute number of non-zero entries per row of A
     std::fill(Ap, Ap + size, 0);
 
     for (int n = 0; n < nnz; n++)
@@ -368,18 +525,55 @@ void coo_to_csr(int size, int nnz, int *row, int *col, double *A, int *Ap, int *
     }
 }
 
-void coo_to_csc(int size, int nnz, int *row, int *col, double *A, int *Ap, int *Ai, double *Ax)
+template<typename T>
+void coo_to_csc(int size, int nnz, int *row, int *col, T *A, int *Ap, int *Ai, T *Ax)
 {
     coo_to_csr(size, nnz, col, row, A, Ap, Ai, Ax);
 }
 
-void csr_to_csc(int size, int nnz, int *Arp, int *Ari, double *Arx, int *Acp, int *Aci, double *Acx)
+template<typename T>
+void csr_to_csc(int size, int nnz, int *Arp, int *Ari, T *Arx, int *Acp, int *Aci, T *Acx)
 {
+    //compute number of non-zero entries per column of A
+    std::fill(Acp, Acp + size, 0);
 
+    for (int n = 0; n < nnz; n++)
+        Acp[Ari[n]]++;
+
+    // cumsum the nnz per column to get Bp[]
+    for(int col = 0, cumsum = 0; col < size; col++)
+    {
+        int temp  = Acp[col];
+        Acp[col] = cumsum;
+        cumsum += temp;
+    }
+    Acp[size] = nnz;
+
+    for(int row = 0; row < size; row++)
+    {
+        for(int jj = Arp[row]; jj < Arp[row+1]; jj++)
+        {
+            int col  = Ari[jj];
+            int dest = Acp[col];
+
+            Aci[dest] = row;
+            Acx[dest] = Arx[jj];
+
+            Acp[col]++;
+        }
+    }
+
+    for(int col = 0, last = 0; col <= size; col++)
+    {
+        int temp  = Acp[col];
+        Acp[col] = last;
+        last = temp;
+    }
 }
 
-void csc_to_csr(int size, int nnz, int *Arp, int *Ari, double *Arx, int *Acp, int *Aci, double *Acx)
+template<typename T>
+void csc_to_csr(int size, int nnz, int *Acp, int *Aci, T *Acx, int *Arp, int *Ari, T *Arx)
 {
-
+    csr_to_csc(size, nnz, Acp, Aci, Acx, Arp, Ari, Arx);
 }
 

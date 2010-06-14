@@ -6,7 +6,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 # optional functionality
 set(COMMON_WITH_SCIPY YES)
 set(COMMON_WITH_UMFPACK YES)
-set(COMMON_WITH_SUPERLU NO)
+set(COMMON_WITH_SUPERLU YES)
 set(COMMON_WITH_SPARSELIB YES)
 
 find_package(PythonLibs REQUIRED)
@@ -52,6 +52,10 @@ cython_add_module(_hermes_common stdcython.cpp)
 target_link_libraries(_hermes_common ${HERMES_COMMON})
 set_property(TARGET _hermes_common PROPERTY COMPILE_FLAGS "-g")
 
+if(COMMON_WITH_SCIPY)
+    add_definitions(-DCOMMON_WITH_SCIPY)
+endif(COMMON_WITH_SCIPY)
+
 if(COMMON_WITH_UMFPACK)
     add_definitions(-DCOMMON_WITH_UMFPACK)
     find_package(UMFPACK REQUIRED)
@@ -79,10 +83,8 @@ if(COMMON_WITH_SPARSELIB)
     set(SPARSELIB_LIBRARIES mv sparse spblas)
     set(SPARSELIB_INCLUDE_DIRS sparselib sparselib/mv sparselib/iml)
     set(SPARSELIB_DEFINITIONS -DCOMPLEX=std::complex<double>)
-
     add_subdirectory(sparselib)
     add_definitions(-DCOMMON_WITH_SPARSELIB)
-
     add_definitions(${SPARSELIB_DEFINITIONS})
     include_directories(${SPARSELIB_INCLUDE_DIRS})
     target_link_libraries(${HERMES_COMMON} ${SPARSELIB_LIBRARIES})

@@ -35,31 +35,35 @@ void print_status(int status)
     }
 }
 
-void solve_linear_system_umfpack(Matrix *mat, double *res)
+bool CommonSolverUmfpack::solve(Matrix *mat, double *res)
 {
+    printf("UMFPACK solver\n");
+
     CooMatrix *mcoo = dynamic_cast<CooMatrix*>(mat);
 
-    int nnz = mcoo->triplets_len();
+    int size = mcoo->get_size();
+    int nnz = mcoo->get_nnz();
+
     int *row = new int[nnz];
     int *col = new int[nnz];
     double *data = new double[nnz];
 
     mcoo->get_row_col_data(row, col, data);
 
-    int *Ap = new int[mcoo->get_size() + 1];
+    int *Ap = new int[size + 1];
     int *Ai = new int[nnz];
     double *Ax = new double[nnz];
 
     umfpack_di_defaults(control_array);
 
     /* convert matrix from triplet form to compressed-column form */
-    int status_triplet_to_col = umfpack_di_triplet_to_col(mcoo->get_size(), mat->get_size(),
+    int status_triplet_to_col = umfpack_di_triplet_to_col(size, size,
                                                           nnz, row, col, data, Ap, Ai, Ax, NULL);
     print_status(status_triplet_to_col);
 
     /* symbolic analysis */
     void *symbolic, *numeric;
-    int status_symbolic = umfpack_di_symbolic(mcoo->get_size(), mcoo->get_size(),
+    int status_symbolic = umfpack_di_symbolic(size, size,
                                               Ap, Ai, NULL, &symbolic,
                                               control_array, info_array);
     print_status(status_symbolic);
@@ -72,7 +76,7 @@ void solve_linear_system_umfpack(Matrix *mat, double *res)
     umfpack_di_free_symbolic(&symbolic);
 
     double *x;
-    x = (double*) malloc(mcoo->get_size() * sizeof(double));
+    x = (double*) malloc(size * sizeof(double));
 
     /* solve system */
     int status_solve = umfpack_di_solve(UMFPACK_A,
@@ -93,22 +97,102 @@ void solve_linear_system_umfpack(Matrix *mat, double *res)
     if (symbolic) umfpack_di_free_symbolic(&symbolic);
     if (numeric) umfpack_di_free_numeric(&numeric);
 
-    memcpy(res, x, mcoo->get_size()*sizeof(double));
+    memcpy(res, x, size*sizeof(double));
 }
 
-void solve_linear_system_umfpack(Matrix *mat, cplx *res)
+bool CommonSolverUmfpack::solve(Matrix *mat, cplx *res)
 {
-    _error("hermes_common: solve_linear_system_umfpack - not implemented.");
+    printf("UMFPACK solver - cplx\n");
+
+    CooMatrix *mcoo = dynamic_cast<CooMatrix*>(mat);
+
+    int size = mcoo->get_size();
+    int nnz = mcoo->get_nnz();
+
+    int *row = new int[nnz];
+    int *col = new int[nnz];
+    double *data_real = new double[nnz];
+    double *data_imag = new double[nnz];
+
+    mcoo->get_row_col_data(row, col, data_real, data_imag);
+
+    int *Ap = new int[size + 1];
+    int *Ai = new int[nnz];
+    double *Axr = new double[nnz];
+    double *Axi = new double[nnz];
+
+    umfpack_zi_defaults(control_array);
+
+    /* convert matrix from triplet form to compressed-column form */
+    int status_triplet_to_col = umfpack_zi_triplet_to_col(size, size,
+                                                          nnz, row, col, data_real, data_imag, Ap, Ai, Axr, Axi, NULL);
+    print_status(status_triplet_to_col);
+
+    /* symbolic analysis */
+    void *symbolic, *numeric;
+    int status_symbolic = umfpack_zi_symbolic(size, size,
+                                              Ap, Ai, NULL, NULL, &symbolic,
+                                              control_array, info_array);
+    print_status(status_symbolic);
+
+    /* LU factorization */
+    int status_numeric = umfpack_zi_numeric(Ap, Ai, Axr, Axi, symbolic, &numeric,
+                                            control_array, info_array);
+    print_status(status_numeric);
+
+    umfpack_zi_free_symbolic(&symbolic);
+
+    double *xr, *xi;
+    xr = (double*) malloc(size * sizeof(double));
+    xi = (double*) malloc(size * sizeof(double));
+
+    double *resr = new double[size];
+    double *resi = new double[size];
+
+    for (int i = 0; i < size; i++)
+    {
+        resr[i] = res[i].real();
+        resi[i] = res[i].imag();
+    }
+
+    /* solve system */
+    int status_solve = umfpack_zi_solve(UMFPACK_A,
+                                        Ap, Ai, Axr, Axi, xr, xi, resr, resi, numeric,
+                                        control_array, info_array);
+
+    print_status(status_solve);
+
+    umfpack_zi_free_numeric(&numeric);
+
+    delete[] data_real;
+    delete[] data_imag;
+    delete[] resr;
+    delete[] resi;
+    delete[] row;
+    delete[] col;
+    delete[] Ap;
+    delete[] Ai;
+    delete[] Axr;
+    delete[] Axi;
+
+    if (symbolic) umfpack_di_free_symbolic(&symbolic);
+    if (numeric) umfpack_di_free_numeric(&numeric);
+
+    for (int i = 0; i < mcoo->get_size(); i++)
+        res[i] = cplx(xr[i], xi[i]);
+
 }
 
 #else
 
-void solve_linear_system_umfpack(Matrix *mat, double *res)
+bool CommonSolverUmfpack::solve(Matrix *mat, double *res)
 {
-    _error("hermes_common: solve_linear_system_umfpack - UMFPACK is not available.");
+    _error("CommonSolverUmfpack::solve(Matrix *mat, double *res) not implemented.");
 }
-void solve_linear_system_umfpack(Matrix *mat, cplx *res)
+
+bool CommonSolverUmfpack::solve(Matrix *mat, cplx *res)
 {
-    _error("hermes_common: solve_linear_system_umfpack - UMFPACK is not available.");
+    _error("CommonSolverUmfpack::solve(Matrix *mat, cplx *res) not implemented.");
 }
+
 #endif

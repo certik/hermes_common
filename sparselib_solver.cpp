@@ -6,7 +6,7 @@
 #include "matrix.h"
 #include "solvers.h"
 
-// #ifdef COMMON_WITH_SPARSELIB
+#ifdef COMMON_WITH_SPARSELIB
 #include <coord_double.h>
 #include <compcol_double.h>
 #include <mvvd.h>
@@ -20,11 +20,11 @@
 #include <ir.h>
 #include <qmr.h>
 
-void solve_linear_system_sparselib(Matrix *mat, double *res)
-{
+bool CommonSolverSparseLib::solve(Matrix *mat, double *res)
+{    
     CooMatrix *mcoo = dynamic_cast<CooMatrix*>(mat);
 
-    int nnz = mcoo->triplets_len();
+    int nnz = mcoo->get_nnz();
     int *row = new int[nnz];
     int *col = new int[nnz];
     double *data = new double[nnz];
@@ -40,16 +40,24 @@ void solve_linear_system_sparselib(Matrix *mat, double *res)
 
     // preconditioner
     CompCol_ILUPreconditioner_double ILU(Acsc);
-
-    // solve
     VECTOR_double xv = ILU.solve(rhs);
 
-    int maxiter = 1000;
-    double tol = 1e-6;
+    // method
+    int result = -1;
+    switch (method)
+    {
+    case CommonSolverSparseLibSolver_ConjugateGradientSquared:
+        result = CGS(Acsc, xv, rhs, ILU, maxiter, tolerance);
+        break;
+    case CommonSolverSparseLibSolver_RichardsonIterativeRefinement:
+        result = IR(Acsc, xv, rhs, ILU, maxiter, tolerance);
+        break;
+    default:
+        _error("SparseLib error. Method is not defined.");
+    }
 
-    int result = CGS(Acsc, xv, rhs, ILU, maxiter, tol);
     if (result == 0)
-        printf("SparseLib CGS: maxiter: %i, tol: %f\n", maxiter, tol);
+        printf("SparseLib solver: maxiter: %i, tol: %f\n", maxiter, tolerance);
     else
         _error("SparseLib error.");
 
@@ -61,21 +69,26 @@ void solve_linear_system_sparselib(Matrix *mat, double *res)
     x = (double*) malloc(mcoo->get_size() * sizeof(double));
 
     for (int i = 0 ; i < xv.size() ; i++)
-    {
-        // printf("(%i): %f\n", i, xv(i));
         x[i] = xv(i);
-    }
 
     memcpy(res, x, mcoo->get_size()*sizeof(double));
 }
 
-/*
+bool CommonSolverSparseLib::solve(Matrix *mat, cplx *res)
+{
+    _error("CommonSolverSparseLib::solve(Matrix *mat, cplx *res) not implemented.");
+}
+
 #else
 
-void solve_linear_system_sparselib(Matrix *mat, double *res)
+bool CommonSolverSparseLib::solve(Matrix *mat, double *res)
 {
-    _error("hermes_common: solve_linear_system_sparselib - SPARSELIB is not available.");
+    _error("CommonSolverSparseLib::solve(Matrix *mat, double *res) not implemented.");
 }
-#endif
-*/
 
+bool CommonSolverSparseLib::solve(Matrix *mat, cplx *res)
+{
+    _error("CommonSolverSparseLib::solve(Matrix *mat, cplx *res) not implemented.");
+}
+
+#endif

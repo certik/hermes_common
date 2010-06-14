@@ -9,15 +9,17 @@
 #ifdef COMMON_WITH_SUPERLU
 #include <superlu/slu_ddefs.h>
 
-void solve_linear_system_superlu(Matrix *mat, double *res)
+bool CommonSolverSuperLU::solve(Matrix *mat, double *res)
 {
+    printf("SuperLU solver\n");
+
     CooMatrix *mcoo = dynamic_cast<CooMatrix*>(mat);
     CSCMatrix mcsc(mcoo);
 
     int nnz = mcsc.get_nnz();
     int *Ap = mcsc.get_Ap();
     int *Ai = mcsc.get_Ai();
-    double *Ax = mcsc.get_A();
+    double *Ax = mcsc.get_Ax();
 
     SuperMatrix A;
     SuperMatrix B;
@@ -110,10 +112,21 @@ void solve_linear_system_superlu(Matrix *mat, double *res)
     */
 }
 
+bool CommonSolverSuperLU::solve(Matrix *mat, cplx *res)
+{
+    _error("CommonSolverSuperLU::solve(Matrix *mat, cplx *res) not implemented.");
+}
+
 #else
 
-void solve_linear_system_superlu(Matrix *mat, double *res)
+bool CommonSolverSuperLU::solve(Matrix *mat, double *res)
 {
-    _error("hermes_common: solve_linear_system_superlu - SUPERLU is not available.");
+    _error("CommonSolverSuperLU::solve(Matrix *mat, double *res) not implemented.");
 }
+
+bool CommonSolverSuperLU::solve(Matrix *mat, cplx *res)
+{
+    _error("CommonSolverSuperLU::solve(Matrix *mat, cplx *res) not implemented.");
+}
+
 #endif

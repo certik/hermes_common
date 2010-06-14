@@ -15,6 +15,7 @@
 #include <math.h>
 #include <string.h>
 #include <complex>
+#include <map>
 
 typedef std::complex<double> cplx;
 class Matrix;
@@ -40,24 +41,6 @@ T** _new_matrix(int m, int n = 0)
         vec[i] = row;
     return vec;
 }
-
-template <typename SCALAR>
-        class Triple
-{
-public:
-    int i;
-    int j;
-    SCALAR v;
-    Triple<SCALAR> *next;
-
-    Triple(int i, int j, SCALAR v)
-    {
-        this->i = i;
-        this->j = j;
-        this->v = v;
-        this->next = NULL;
-    }
-};
 
 class Matrix {
 public:
@@ -114,6 +97,7 @@ public:
         init();
 
         this->_is_complex = is_complex;
+        this->size = 0;
     }
     CooMatrix(int size, bool is_complex = false) : Matrix()
     {
@@ -130,198 +114,39 @@ public:
     virtual void init()
     {
         this->_is_complex = false;
-        this->size = 0;
-        this->list = NULL;
-        this->list_last = NULL;
-        this->list_cplx = NULL;
-        this->list_last_cplx = NULL;
     }
 
-    template <typename SCALAR>
-    void free_data()
-    {
-        Triple<SCALAR> *t = this->get_list<SCALAR>();
-        while (t != NULL)
-        {
-            Triple<SCALAR> *t_old = t;
-            t = t->next;
-            delete t_old;
-        }
-    }
-
+    void free_data();
     virtual void set_zero();
 
-    virtual void add(int m, int n, double v)
+    virtual void add(int m, int n, double v);
+    virtual void add(int m, int n, cplx v);
+    void get_row_col_data(int *row, int *col, double *data);
+    void get_row_col_data(int *row, int *col, cplx *data);
+    void get_row_col_data(int *row, int *col, double *data_real, double *data_imag);
+
+    virtual void copy_into(Matrix *m);
+
+    inline virtual double get(int m, int n)
     {
-        if (this->_is_complex)
-            _error("can't use add(int, int, double) for complex matrix");
-
-        // adjusting size if necessary
-        if (m+1 > this->size) this->size = m+1;
-        if (n+1 > this->size) this->size = n+1;
-
-        // debug
-        if (DEBUG_MATRIX) {
-            printf("Matrix_add %d %d %g -> size = %d\n", m, n, v, this->size);
-        }
-
-        // add new triple
-        Triple<double> *t = new Triple<double>(m, n, v);
-        if (this->list == NULL)
-        {
-            this->list = t;
-            this->list_last = t;
-        }
-        else
-        {
-            this->list_last->next = t;
-            this->list_last = this->list_last->next;
-        }
+        return A[m][n];
     }
 
-    virtual void add(int m, int n, cplx v)
-    {
-        if (!(this->_is_complex))
-            _error("can't use add(int, int, cplx) for real matrix");
-
-        // adjusting size if necessary
-        if (m+1 > this->size) this->size = m+1;
-        if (n+1 > this->size) this->size = n+1;
-
-        Triple<cplx> *t = new Triple<cplx>(m, n, v);
-        if (this->list_cplx == NULL) {
-            this->list_cplx = t;
-            this->list_last_cplx = t;
-        } else {
-            this->list_last_cplx->next = t;
-            this->list_last_cplx = this->list_last_cplx->next;
-        }
-    }
-
-    virtual void copy_into(Matrix *m) {
-        m->set_zero();
-        if (this->_is_complex) {
-            Triple<cplx> *t = this->list_cplx;
-            while (t != NULL) {
-                m->add(t->i, t->j, t->v);
-                t = t->next;
-            }
-        } else {
-            Triple<double> *t = this->list;
-            while (t != NULL) {
-                m->add(t->i, t->j, t->v);
-                t = t->next;
-            }
-        }
-    }
-
-    // Returns the number of triplets
-    int triplets_len()
-    {
-        Triple<double> *t = this->list;
-        int len = 0;
-        while (t != NULL)
-        {
-            len++;
-            t = t->next;
-        }
-        return len;
-    }
-
-    int triplets_len_cplx()
-    {
-        Triple<cplx> *t = this->list_cplx;
-        int len = 0;
-        while (t != NULL)
-        {
-            len++;
-            t = t->next;
-        }
-        return len;
-    }
-
-    // Returns the row/col indices, together with the data. All row, col
-    // and data arrays have to be initialized (use this->triplets_len).
-    void get_row_col_data(int *row, int *col, double *data)
-    {
-        Triple<double> *t = this->list;
-        int i = 0;
-        while (t)
-        {
-            row[i] = t->i;
-            col[i] = t->j;
-            data[i] = t->v;
-            i++;
-            t = t->next;
-        }
-    }
-
-    void get_row_col_data(int *row, int *col, cplx *data)
-    {
-        Triple<cplx> *t = this->list_cplx;
-        int i = 0;
-        while (t)
-        {
-            row[i] = t->i;
-            col[i] = t->j;
-            data[i] = t->v;
-            i++;
-            t = t->next;
-        }
-    }
-
-    virtual double get(int m, int n)
-    {
-        double out = 0.0;
-        Triple<double> *t = this->list;
-        while (t)
-        {
-            if (m == t->i && n == t->j)
-                out += t->v;
-            t = t->next;
-        }
-        return out;
-    }
-
-    virtual int get_size()
+    inline virtual int get_size()
     {
         return this->size;
     }
 
+    virtual int get_nnz();
+
     virtual void print();
-
-    virtual void times_vector(double* vec, double* result, int rank)
-    {
-        for (int i=0; i < rank; i++) result[i] = 0;
-        Triple<double> *t = this->list;
-        while (t != NULL)
-        {
-            result[t->i] += t->v * vec[t->j];
-            t = t->next;
-        }
-    }
-
-    template <typename SCALAR> Triple<SCALAR> *get_list()
-    {
-        // this works for SCALAR=double, and in matrix.cpp, we specialize
-        // it for SCALAR=cplx
-        return this->list;
-    }
-
+    virtual void times_vector(double* vec, double* result, int rank);
 
 private:
     int size;
-    /*
-       We represent the COO matrix as a list of Triples (i, j, v), where
-       (i, j) can be redundant (then the corresponding "v" have to be
-       summed). We remember the pointers to the first (*list) and last
-       (*list_last) element.
-    */
-    Triple<double> *list;
-    Triple<double> *list_last;
 
-    Triple<cplx> *list_cplx;
-    Triple<cplx> *list_last_cplx;
+    std::map<size_t, std::map<size_t, double> > A;
+    std::map<size_t, std::map<size_t, cplx> > A_cplx;
 };
 
 class DenseMatrix : public Matrix
@@ -484,8 +309,8 @@ public:
         this->_is_complex = false;
         this->size = 0;
         this->nnz = 0;
-        this->A = NULL;
-        this->A_cplx = NULL;
+        this->Ax = NULL;
+        this->Ax_cplx = NULL;
         this->Ap = NULL;
         this->Ai = NULL;
     }
@@ -494,8 +319,8 @@ public:
     {
         if (this->Ap) { delete[] this->Ap; this->Ap = NULL; }
         if (this->Ai) { delete[] this->Ai; this->Ai = NULL; }
-        if (this->A) { delete[] this->A; this->A = NULL; }
-        if (this->A_cplx) { delete[] this->A_cplx; this->A_cplx = NULL; }
+        if (this->Ax) { delete[] this->Ax; this->Ax = NULL; }
+        if (this->Ax_cplx) { delete[] this->Ax_cplx; this->Ax_cplx = NULL; }
     }
 
     void add_from_dense(DenseMatrix *m);
@@ -536,13 +361,13 @@ public:
     {
         return this->Ai;
     }
-    double *get_A()
+    double *get_Ax()
     {
-        return this->A;
+        return this->Ax;
     }
-    cplx *get_A_cplx()
+    cplx *get_Ax_cplx()
     {
-        return this->A_cplx;
+        return this->Ax_cplx;
     }
 
 private:
@@ -551,8 +376,8 @@ private:
     // number of non-zeros
     int nnz;
 
-    double *A;
-    cplx *A_cplx;
+    double *Ax;
+    cplx *Ax_cplx;
 
     int *Ap;
     int *Ai;
@@ -590,8 +415,8 @@ public:
         this->_is_complex = false;
         this->size = 0;
         this->nnz = 0;
-        this->A = NULL;
-        this->A_cplx = NULL;
+        this->Ax = NULL;
+        this->Ax_cplx = NULL;
         this->Ap = NULL;
         this->Ai = NULL;
     }
@@ -600,8 +425,8 @@ public:
     {
         if (this->Ap) { delete[] this->Ap; this->Ap = NULL; }
         if (this->Ai) { delete[] this->Ai; this->Ai = NULL; }
-        if (this->A) { delete[] this->A; this->A = NULL; }
-        if (this->A_cplx) { delete[] this->A_cplx; this->A_cplx = NULL; }
+        if (this->Ax) { delete[] this->Ax; this->Ax = NULL; }
+        if (this->Ax_cplx) { delete[] this->Ax_cplx; this->Ax_cplx = NULL; }
     }
 
     void add_from_coo(CooMatrix *m);
@@ -643,13 +468,13 @@ public:
     {
         return this->Ai;
     }
-    double *get_A()
+    double *get_Ax()
     {
-        return this->A;
+        return this->Ax;
     }
-    cplx *get_A_cplx()
+    cplx *get_Ax_cplx()
     {
-        return this->A_cplx;
+        return this->Ax_cplx;
     }
 
 private:
@@ -658,8 +483,8 @@ private:
     // number of non-zeros
     int nnz;
 
-    double *A;
-    cplx *A_cplx;
+    double *Ax;
+    cplx *Ax_cplx;
 
     int *Ap;
     int *Ai;
@@ -672,7 +497,13 @@ void print_vector(const char *label, double *value, int size);
 // print vector - cplx
 void print_vector(const char *label, cplx *value, int size);
 
-void coo_to_csr(int size, int nnz, int *row, int *col, double *A, int *Ap, int *Ai, double *Ax);
-void coo_to_csc(int size, int nnz, int *row, int *col, double *A, int *Ap, int *Ai, double *Ax);
+template<typename T>
+void coo_to_csr(int size, int nnz, int *row, int *col, T *A, int *Ap, int *Ai, T *Ax);
+template<typename T>
+void coo_to_csc(int size, int nnz, int *row, int *col, T *A, int *Ap, int *Ai, T *Ax);
+template<typename T>
+void csr_to_csc(int size, int nnz, int *Arp, int *Ari, T *Arx, int *Acp, int *Aci, T *Acx);
+template<typename T>
+void csc_to_csr(int size, int nnz, int *Acp, int *Aci, T *Acx, int *Arp, int *Ari, T *Arx);
 
 #endif

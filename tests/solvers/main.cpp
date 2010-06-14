@@ -14,62 +14,7 @@ void _assert(bool a)
     if (!a) throw std::runtime_error("Assertion failed.");
 }
 
-void test_solver1()
-{
-    CooMatrix A(4);
-    A.add(0, 0, -1);
-    A.add(1, 1, -1);
-    A.add(2, 2, -1);
-    A.add(3, 3, -1);
-    A.add(0, 1, 2);
-    A.add(1, 0, 2);
-    A.add(1, 2, 2);
-    A.add(2, 1, 2);
-    A.add(2, 3, 2);
-    A.add(3, 2, 2);
-
-    double res[4] = {1., 1., 1., 1.};
-
-    solve_linear_system_dense_lu(&A, res);
-    _assert(fabs(res[0] - 0.2) < EPS);
-    _assert(fabs(res[1] - 0.6) < EPS);
-    _assert(fabs(res[2] - 0.6) < EPS);
-    _assert(fabs(res[3] - 0.2) < EPS);
-}
-
-void test_solver2()
-{
-    CooMatrix A(4);
-    A.add(0, 0, -1);
-    A.add(1, 1, -1);
-    A.add(2, 2, -1);
-    A.add(3, 3, -1);
-    A.add(0, 1, 2);
-    A.add(1, 0, 2);
-    A.add(1, 2, 2);
-    A.add(2, 1, 2);
-    A.add(2, 3, 2);
-    A.add(3, 2, 2);
-
-    double res[4] = {1., 1., 1., 1.};
-
-    solve_linear_system_dense_lu(&A, res);
-    _assert(fabs(res[0] - 0.2) < EPS);
-    _assert(fabs(res[1] - 0.6) < EPS);
-    _assert(fabs(res[2] - 0.6) < EPS);
-    _assert(fabs(res[3] - 0.2) < EPS);
-
-    DenseMatrix B(&A);
-    for (int i=0; i < 4; i++) res[i] = 1.;
-
-    solve_linear_system_dense_lu(&B, res);
-    _assert(fabs(res[0] - 0.2) < EPS);
-    _assert(fabs(res[1] - 0.6) < EPS);
-    _assert(fabs(res[2] - 0.6) < EPS);
-    _assert(fabs(res[3] - 0.2) < EPS);
-}
-
-void test_solver3()
+void test_solver_scipy_1()
 {
     CooMatrix A(4);
     A.add(0, 0, -1);
@@ -104,16 +49,9 @@ void test_solver3()
     _assert(fabs(res[1] - 0.6) < EPS);
     _assert(fabs(res[2] - 0.6) < EPS);
     _assert(fabs(res[3] - 0.2) < EPS);
-
-    for (int i=0; i < 4; i++) res[i] = 1.;
-    _assert(solve_linear_system_cg(&A, res, EPS, 2) == 1);
-    _assert(fabs(res[0] - 0.2) < EPS);
-    _assert(fabs(res[1] - 0.6) < EPS);
-    _assert(fabs(res[2] - 0.6) < EPS);
-    _assert(fabs(res[3] - 0.2) < EPS);
 }
 
-void test_solver4()
+void test_solver_scipy_2()
 {
     CooMatrix A(5);
     A.add(0, 0, 2);
@@ -162,7 +100,7 @@ void test_solver4()
     _assert(fabs(res[4] - 5.) < EPS);
 }
 
-void test_solver5()
+void test_solver_scipy_3()
 {
     CooMatrix A(5);
     A.add(0, 0, 2);
@@ -215,7 +153,7 @@ void test_solver5()
     _assert(fabs(res[4].imag() - 0.) < EPS);
 }
 
-void test_solver6()
+void test_solver_scipy_4()
 {
     CooMatrix A(2, true);
     A.add(0, 0, cplx(1, 1));
@@ -280,7 +218,7 @@ void test_solver6()
     _assert(fabs(res[1].imag() - (-0.75)) < EPS);
 }
 
-void test_solver7()
+void test_solver_umfpack_real()
 {
     CooMatrix A(5);
     A.add(0, 0, 2);
@@ -303,11 +241,9 @@ void test_solver7()
     _assert(fabs(res[2] - 3.) < EPS);
     _assert(fabs(res[3] - 4.) < EPS);
     _assert(fabs(res[4] - 5.) < EPS);
-
-    std::cout << res[0] << std::endl;
 }
 
-void test_solver8()
+void test_solver_umfpack_imag()
 {
     CooMatrix A(2, true);
     A.add(0, 0, cplx(1, 1));
@@ -328,7 +264,7 @@ void test_solver8()
     _assert(fabs(res[1].imag() - (-0.25)) < EPS);
 }
 
-void test_solver9()
+void test_solver_sparselib_cgs()
 {
     CooMatrix A(5);
     A.add(0, 0, 2);
@@ -345,7 +281,55 @@ void test_solver9()
     A.add(4, 4, 1);
 
     double res[5] = {8., 45., -3., 3., 19.};
-    solve_linear_system_sparselib(&A, res);
+    solve_linear_system_sparselib_cgs(&A, res);
+    _assert(fabs(res[0] - 1.) < EPS);
+    _assert(fabs(res[1] - 2.) < EPS);
+    _assert(fabs(res[2] - 3.) < EPS);
+    _assert(fabs(res[3] - 4.) < EPS);
+    _assert(fabs(res[4] - 5.) < EPS);
+}
+
+void test_solver_sparselib_ir()
+{
+    CooMatrix A(4);
+    A.add(0, 0, -1);
+    A.add(1, 1, -1);
+    A.add(2, 2, -1);
+    A.add(3, 3, -1);
+    A.add(0, 1, 2);
+    A.add(1, 0, 2);
+    A.add(1, 2, 2);
+    A.add(2, 1, 2);
+    A.add(2, 3, 2);
+    A.add(3, 2, 2);
+
+    double res[4] = {1., 1., 1., 1.};
+
+    solve_linear_system_sparselib_ir(&A, res);
+    _assert(fabs(res[0] - 1.) < EPS);
+    _assert(fabs(res[1] - 2.) < EPS);
+    _assert(fabs(res[2] - 3.) < EPS);
+    _assert(fabs(res[3] - 4.) < EPS);
+    _assert(fabs(res[4] - 5.) < EPS);
+}
+
+void test_solver_superlu()
+{
+    CooMatrix A(4);
+    A.add(0, 0, -1);
+    A.add(1, 1, -1);
+    A.add(2, 2, -1);
+    A.add(3, 3, -1);
+    A.add(0, 1, 2);
+    A.add(1, 0, 2);
+    A.add(1, 2, 2);
+    A.add(2, 1, 2);
+    A.add(2, 3, 2);
+    A.add(3, 2, 2);
+
+    double res[4] = {1., 1., 1., 1.};
+
+    solve_linear_system_superlu(&A, res);
     _assert(fabs(res[0] - 1.) < EPS);
     _assert(fabs(res[1] - 2.) < EPS);
     _assert(fabs(res[2] - 3.) < EPS);
@@ -356,22 +340,22 @@ void test_solver9()
 int main(int argc, char* argv[])
 {
     try {
-        test_solver1();
-        test_solver2();
-#ifdef COMMON_WITH_SCIPY
-        test_solver3();
-        test_solver4();
-        test_solver5();
-        test_solver6();
-#endif
-#ifdef COMMON_WITH_UMFPACK
-        test_solver7();
-        // test_solver8();
-#endif
-// #ifdef COMMON_WITH_SPARSELIB
-        test_solver9();
-        // test_solver10();
-// #endif
+        // NumPy + SciPy
+        test_solver_scipy_1();
+        test_solver_scipy_2();
+        test_solver_scipy_3();
+        test_solver_scipy_4();
+
+        // UMFPACK
+        test_solver_umfpack_real();
+        test_solver_umfpack_imag();
+
+        // SparseLib
+        test_solver_sparselib_cgs();
+        // test_solver_sparselib_ir();
+
+        // SuperLU
+        // test_solver_superlu();
 
         return ERROR_SUCCESS;
     } catch(std::exception const &ex) {
