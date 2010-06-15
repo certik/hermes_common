@@ -57,7 +57,7 @@ bool CommonSolverSparseLib::solve(Matrix *mat, double *res)
     }
 
     if (result == 0)
-        printf("SparseLib solver: maxiter: %i, tol: %f\n", maxiter, tolerance);
+        printf("SparseLib solver: maxiter: %i, tol: %e\n", maxiter, tolerance);
     else
         _error("SparseLib error.");
 

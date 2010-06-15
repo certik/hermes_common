@@ -58,7 +58,8 @@ bool CommonSolverUmfpack::solve(Matrix *mat, double *res)
 
     /* convert matrix from triplet form to compressed-column form */
     int status_triplet_to_col = umfpack_di_triplet_to_col(size, size,
-                                                          nnz, row, col, data, Ap, Ai, Ax, NULL);
+                                                          nnz, row, col, data,
+                                                          Ap, Ai, Ax, NULL);
     print_status(status_triplet_to_col);
 
     /* symbolic analysis */
@@ -180,7 +181,6 @@ bool CommonSolverUmfpack::solve(Matrix *mat, cplx *res)
 
     for (int i = 0; i < mcoo->get_size(); i++)
         res[i] = cplx(xr[i], xi[i]);
-
 }
 
 #else

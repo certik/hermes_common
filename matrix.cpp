@@ -63,6 +63,25 @@ void transpose(T** matrix, int m, int n)
 
 // *********************************************************************************************************************
 
+CooMatrix::CooMatrix(bool complex) : Matrix()
+{
+    init();
+
+    this->complex = complex;
+    this->size = 0;
+}
+CooMatrix::CooMatrix(int size, bool complex) : Matrix()
+{
+    init();
+
+    this->complex = complex;
+    this->size = size;
+}
+CooMatrix::~CooMatrix()
+{
+    this->free_data();
+}
+
 void CooMatrix::free_data()
 {
     // for(std::map<size_t, std::map<size_t, double> >::const_iterator it_row = A.begin(); it_row != A.end(); ++it_row)
@@ -72,21 +91,18 @@ void CooMatrix::free_data()
     // for(std::map<size_t, std::map<size_t, cplx> >::const_iterator it_row = A_cplx.begin(); it_row != A_cplx.end(); ++it_row)
     //    it_row->second.clear();
     A_cplx.clear();
+
+    this->size = 0;
 }
 
 void CooMatrix::add(int m, int n, double v)
 {
-    if (this->_is_complex)
+    if (this->complex)
         _error("can't use add(int, int, double) for complex matrix");
 
     // adjusting size if necessary
     if (m+1 > this->size) this->size = m+1;
     if (n+1 > this->size) this->size = n+1;
-
-    // debug
-    if (DEBUG_MATRIX) {
-        printf("Matrix_add %d %d %g -> size = %d\n", m, n, v, this->size);
-    }
 
     // add new
     A[m][n] += v;
@@ -94,7 +110,7 @@ void CooMatrix::add(int m, int n, double v)
 
 void CooMatrix::add(int m, int n, cplx v)
 {
-    if (!(this->_is_complex))
+    if (!(this->complex))
         _error("can't use add(int, int, cplx) for real matrix");
 
     // adjusting size if necessary
@@ -106,10 +122,10 @@ void CooMatrix::add(int m, int n, cplx v)
 
 void CooMatrix::copy_into(Matrix *m)
 {
-    m->set_zero();
+    m->free_data();
 
     int index = 0;
-    if (this->_is_complex)
+    if (this->complex)
     {
         for(std::map<size_t, std::map<size_t, cplx> >::const_iterator it_row = A_cplx.begin(); it_row != A_cplx.end(); ++it_row)
         {
@@ -191,7 +207,7 @@ void CooMatrix::get_row_col_data(int *row, int *col, double *data_real, double *
 int CooMatrix::get_nnz()
 {
     int nnz = 0;
-    if (_is_complex)
+    if (complex)
         for(std::map<size_t, std::map<size_t, cplx> >::const_iterator it_row = A_cplx.begin(); it_row != A_cplx.end(); ++it_row)
             nnz += it_row->second.size();
     else
@@ -212,16 +228,6 @@ void CooMatrix::times_vector(double* vec, double* result, int rank)
             index++;
         }
     }
-}
-
-void CooMatrix::set_zero()
-{
-    if (this->_is_complex)
-        A_cplx.clear();
-    else
-        A.clear();
-
-    this->size = 0;
 }
 
 void CooMatrix::print()
@@ -258,6 +264,29 @@ void CooMatrix::print()
 }
 
 // *********************************************************************************************************************
+CSRMatrix::CSRMatrix(int size) : Matrix()
+{
+    init();
+    this->size = size;
+}
+
+CSRMatrix::CSRMatrix(CooMatrix *m) : Matrix()
+{
+    init();
+    this->add_from_coo(m);
+}
+
+CSRMatrix::CSRMatrix(CSCMatrix *m) : Matrix()
+{
+    init();
+    this->add_from_csc(m);
+}
+
+CSRMatrix::CSRMatrix(DenseMatrix *m) : Matrix()
+{
+    init();
+    this->add_from_dense(m);
+}
 
 CSRMatrix::CSRMatrix(Matrix *m) : Matrix()
 {
@@ -271,6 +300,34 @@ CSRMatrix::CSRMatrix(Matrix *m) : Matrix()
         this->add_from_dense((DenseMatrix*)m);
     else
         _error("Matrix type not supported.");
+}
+
+CSRMatrix::~CSRMatrix()
+{
+    free_data();
+}
+
+void CSRMatrix::init()
+{
+    this->complex = false;
+    this->size = 0;
+    this->nnz = 0;
+
+    this->Ax = NULL;
+    this->Ax_cplx = NULL;
+    this->Ap = NULL;
+    this->Ai = NULL;
+}
+
+void CSRMatrix::free_data()
+{
+    if (this->Ap) { delete[] this->Ap; this->Ap = NULL; }
+    if (this->Ai) { delete[] this->Ai; this->Ai = NULL; }
+    if (this->Ax) { delete[] this->Ax; this->Ax = NULL; }
+    if (this->Ax_cplx) { delete[] this->Ax_cplx; this->Ax_cplx = NULL; }
+
+    this->size = 0;
+    this->nnz = 0;
 }
 
 void CSRMatrix::add_from_dense(DenseMatrix *m)
@@ -314,13 +371,13 @@ void CSRMatrix::add_from_dense(DenseMatrix *m)
 
 void CSRMatrix::add_from_coo(CooMatrix *m)
 {
-    this->size = m->get_size();
-    this->nnz = m->get_nnz();
-    this->_is_complex = m->is_complex();
-
-    // allocate data
     free_data();
 
+    this->size = m->get_size();
+    this->nnz = m->get_nnz();
+    this->complex = m->is_complex();
+
+    // allocate data
     this->Ap = new int[this->size + 1];
     this->Ai = new int[this->nnz];
     if (is_complex())
@@ -353,13 +410,13 @@ void CSRMatrix::add_from_coo(CooMatrix *m)
 
 void CSRMatrix::add_from_csc(CSCMatrix *m)
 {
-    this->size = m->get_size();
-    this->nnz = m->get_nnz();
-    this->_is_complex = m->is_complex();
-
-    // allocate data
     free_data();
 
+    this->size = m->get_size();
+    this->nnz = m->get_nnz();
+    this->complex = m->is_complex();
+
+    // allocate data
     this->Ap = new int[this->size + 1];
     this->Ai = new int[this->nnz];
     if (is_complex())
@@ -393,6 +450,24 @@ void CSRMatrix::print()
 
 // *********************************************************************************************************************
 
+CSCMatrix::CSCMatrix(int size) : Matrix()
+{
+    init();
+    this->size = size;
+}
+
+CSCMatrix::CSCMatrix(CooMatrix *m) : Matrix()
+{
+    init();
+    this->add_from_coo(m);
+}
+
+CSCMatrix::CSCMatrix(CSRMatrix *m) : Matrix()
+{
+    init();
+    this->add_from_csr(m);
+}
+
 CSCMatrix::CSCMatrix(Matrix *m) : Matrix()
 {
     init();
@@ -405,15 +480,43 @@ CSCMatrix::CSCMatrix(Matrix *m) : Matrix()
         _error("Matrix type not supported.");
 }
 
+CSCMatrix::~CSCMatrix()
+{
+    free_data();
+}
+
+void CSCMatrix::init()
+{
+    this->complex = false;
+    this->size = 0;
+    this->nnz = 0;
+
+    this->Ax = NULL;
+    this->Ax_cplx = NULL;
+    this->Ap = NULL;
+    this->Ai = NULL;
+}
+
+void CSCMatrix::free_data()
+{
+    if (this->Ap) { delete[] this->Ap; this->Ap = NULL; }
+    if (this->Ai) { delete[] this->Ai; this->Ai = NULL; }
+    if (this->Ax) { delete[] this->Ax; this->Ax = NULL; }
+    if (this->Ax_cplx) { delete[] this->Ax_cplx; this->Ax_cplx = NULL; }
+
+    size = 0;
+    nnz = 0;
+}
+
 void CSCMatrix::add_from_coo(CooMatrix *m)
 {
-    this->size = m->get_size();
-    this->nnz = m->get_nnz();
-    this->_is_complex = m->is_complex();
-
-    // allocate data
     free_data();
 
+    this->size = m->get_size();
+    this->nnz = m->get_nnz();
+    this->complex = m->is_complex();
+
+    // allocate data
     this->Ap = new int[this->size + 1];
     this->Ai = new int[this->nnz];
     if (is_complex())
@@ -446,13 +549,13 @@ void CSCMatrix::add_from_coo(CooMatrix *m)
 
 void CSCMatrix::add_from_csr(CSRMatrix *m)
 {
-    this->size = m->get_size();
-    this->nnz = m->get_nnz();
-    this->_is_complex = m->is_complex();
-
-    // allocate data
     free_data();
 
+    this->size = m->get_size();
+    this->nnz = m->get_nnz();
+    this->complex = m->is_complex();
+
+    // allocate data
     this->Ap = new int[this->size + 1];
     this->Ai = new int[this->nnz];
     if (is_complex())

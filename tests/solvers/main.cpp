@@ -291,20 +291,21 @@ void test_solver_sparselib_cgs()
 
 void test_solver_sparselib_ir()
 {
-    CooMatrix A(4);
-    A.add(0, 0, -1);
-    A.add(1, 1, -1);
-    A.add(2, 2, -1);
-    A.add(3, 3, -1);
-    A.add(0, 1, 2);
-    A.add(1, 0, 2);
-    A.add(1, 2, 2);
-    A.add(2, 1, 2);
+    CooMatrix A(5);
+    A.add(0, 0, 2);
+    A.add(0, 1, 3);
+    A.add(1, 0, 3);
+    A.add(1, 2, 4);
+    A.add(1, 4, 6);
+    A.add(2, 1, -1);
+    A.add(2, 2, -3);
     A.add(2, 3, 2);
-    A.add(3, 2, 2);
+    A.add(3, 2, 1);
+    A.add(4, 1, 4);
+    A.add(4, 2, 2);
+    A.add(4, 4, 1);
 
-    double res[4] = {1., 1., 1., 1.};
-
+    double res[5] = {8., 45., -3., 3., 19.};
     solve_linear_system_sparselib_ir(&A, res);
     _assert(fabs(res[0] - 1.) < EPS);
     _assert(fabs(res[1] - 2.) < EPS);
@@ -315,20 +316,21 @@ void test_solver_sparselib_ir()
 
 void test_solver_superlu()
 {
-    CooMatrix A(4);
-    A.add(0, 0, -1);
-    A.add(1, 1, -1);
-    A.add(2, 2, -1);
-    A.add(3, 3, -1);
-    A.add(0, 1, 2);
-    A.add(1, 0, 2);
-    A.add(1, 2, 2);
-    A.add(2, 1, 2);
+    CooMatrix A(5);
+    A.add(0, 0, 2);
+    A.add(0, 1, 3);
+    A.add(1, 0, 3);
+    A.add(1, 2, 4);
+    A.add(1, 4, 6);
+    A.add(2, 1, -1);
+    A.add(2, 2, -3);
     A.add(2, 3, 2);
-    A.add(3, 2, 2);
+    A.add(3, 2, 1);
+    A.add(4, 1, 4);
+    A.add(4, 2, 2);
+    A.add(4, 4, 1);
 
-    double res[4] = {1., 1., 1., 1.};
-
+    double res[5] = {8., 45., -3., 3., 19.};
     solve_linear_system_superlu(&A, res);
     _assert(fabs(res[0] - 1.) < EPS);
     _assert(fabs(res[1] - 2.) < EPS);
@@ -355,7 +357,7 @@ int main(int argc, char* argv[])
         // test_solver_sparselib_ir();
 
         // SuperLU
-        // test_solver_superlu();
+        test_solver_superlu();
 
         return ERROR_SUCCESS;
     } catch(std::exception const &ex) {

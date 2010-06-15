@@ -48,12 +48,14 @@ bool CommonSolverSuperLU::solve(Matrix *mat, double *res)
     set_default_options(&options);
 
     // create csc matrix
-    dCreate_CompCol_Matrix(&A, mcsc.get_size(), mcsc.get_size(), nnz, Ax, Ai, Ap, SLU_NC, SLU_D, SLU_GE);
+    dCreate_CompCol_Matrix(&A, mcsc.get_size(), mcsc.get_size(), nnz, Ax, Ai, Ap,
+                           SLU_NC, SLU_D, SLU_GE);
     // dPrint_CompCol_Matrix("A", &A);
 
     nrhs = 1;
     // create rhs matrix
-    dCreate_Dense_Matrix(&B, mcsc.get_size(), nrhs, res, mcsc.get_size(), SLU_DN, SLU_D, SLU_GE);
+    dCreate_Dense_Matrix(&B, mcsc.get_size(), nrhs, res, mcsc.get_size(),
+                         SLU_DN, SLU_D, SLU_GE);
     // dPrint_Dense_Matrix("B", &B);
 
     // column permutation vector
@@ -76,7 +78,6 @@ bool CommonSolverSuperLU::solve(Matrix *mat, double *res)
         // copy result
         memcpy(res, x, mcsc.get_size()*sizeof(double));
 
-        // print_vector("X", x, mcsc.get_size());
         /*
         SCformat *Lstore = (SCformat *) L.Store;
         NCformat *Ustore = (NCformat *) U.Store;
@@ -100,6 +101,7 @@ bool CommonSolverSuperLU::solve(Matrix *mat, double *res)
             printf("L\\U MB %.3f\ttotal MB needed %.3f\n", mem_usage.for_lu/1e6, mem_usage.total_needed/1e6);
         }
     }
+
 
     SUPERLU_FREE (perm_r);
     SUPERLU_FREE (perm_c);
