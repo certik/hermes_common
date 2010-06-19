@@ -4,7 +4,7 @@
 #include "matrix.h"
 #include "solvers.h"
 
-#define EPS 1e-12
+#define EPS 1e-6
 
 #define ERROR_SUCCESS                               0
 #define ERROR_FAILURE                              -1
@@ -295,7 +295,7 @@ void test_solver_sparselib_ir()
     A.add(0, 0, 2);
     A.add(0, 1, 3);
     A.add(1, 0, 3);
-    A.add(1, 2, 4);
+    A.add(1, 1, 4);
     A.add(1, 4, 6);
     A.add(2, 1, -1);
     A.add(2, 2, -3);
@@ -305,13 +305,14 @@ void test_solver_sparselib_ir()
     A.add(4, 2, 2);
     A.add(4, 4, 1);
 
+    A.print();
     double res[5] = {8., 45., -3., 3., 19.};
     solve_linear_system_sparselib_ir(&A, res);
-    _assert(fabs(res[0] - 1.) < EPS);
-    _assert(fabs(res[1] - 2.) < EPS);
-    _assert(fabs(res[2] - 3.) < EPS);
-    _assert(fabs(res[3] - 4.) < EPS);
-    _assert(fabs(res[4] - 5.) < EPS);
+    _assert(fabs(res[0] - 1.24489795918367) < EPS);
+    _assert(fabs(res[1] - 1.83673469387755) < EPS);
+    _assert(fabs(res[2] - 3.00000000000000) < EPS);
+    _assert(fabs(res[3] - 3.91836734693878) < EPS);
+    _assert(fabs(res[4] - 5.65306122448980) < EPS);
 }
 
 void test_solver_superlu()
@@ -342,22 +343,27 @@ void test_solver_superlu()
 int main(int argc, char* argv[])
 {
     try {
+        // SparseLib++
+        test_solver_sparselib_cgs();
+        test_solver_sparselib_ir();
+
         // NumPy + SciPy
+#ifdef COMMON_WITH_SCIPY
         test_solver_scipy_1();
         test_solver_scipy_2();
         test_solver_scipy_3();
         test_solver_scipy_4();
-
+#endif
         // UMFPACK
+#ifdef COMMON_WITH_UMFPACK
         test_solver_umfpack_real();
         test_solver_umfpack_imag();
-
-        // SparseLib
-        test_solver_sparselib_cgs();
-        // test_solver_sparselib_ir();
+#endif
 
         // SuperLU
+#ifdef COMMON_WITH_SUPERLU
         test_solver_superlu();
+#endif
 
         return ERROR_SUCCESS;
     } catch(std::exception const &ex) {

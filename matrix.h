@@ -98,12 +98,19 @@ class CooMatrix : public Matrix {
 public:
     CooMatrix(bool complex = false);
     CooMatrix(int size, bool complex = false);
+    CooMatrix(Matrix *m);
+    CooMatrix(CooMatrix *m);
+    CooMatrix(CSRMatrix *m);
+    CooMatrix(CSCMatrix *m);
     ~CooMatrix();
 
     inline virtual void init() { this->complex = false; free_data(); }
     virtual void free_data();
     virtual int get_nnz();
     virtual void print();
+
+    void add_from_csr(CSRMatrix *m);
+    void add_from_csc(CSCMatrix *m);
 
     virtual void add(int m, int n, double v);
     virtual void add(int m, int n, cplx v);
@@ -298,6 +305,8 @@ public:
     CSCMatrix(Matrix *m);
     CSCMatrix(CooMatrix *m);
     CSCMatrix(CSRMatrix *m);
+    CSCMatrix(int size, int nnz, int *Ap, int *Ai, double *Ax);
+    CSCMatrix(int size, int nnz, int *Ap, int *Ai, cplx *Ax_cplx);
     ~CSCMatrix();
 
     virtual void init();
@@ -363,5 +372,9 @@ template<typename T>
 void csr_to_csc(int size, int nnz, int *Arp, int *Ari, T *Arx, int *Acp, int *Aci, T *Acx);
 template<typename T>
 void csc_to_csr(int size, int nnz, int *Acp, int *Aci, T *Acx, int *Arp, int *Ari, T *Arx);
+template<typename T>
+void csc_to_coo(int size, int nnz, int *Ap, int *Ai, T *Ax, int *row, int *col, T *A);
+template<typename T>
+void csr_to_coo(int size, int nnz, int *Ap, int *Ai, T *Ax, int *row, int *col, T *A);
 
 #endif

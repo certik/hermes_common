@@ -70,6 +70,7 @@ CooMatrix::CooMatrix(bool complex) : Matrix()
     this->complex = complex;
     this->size = 0;
 }
+
 CooMatrix::CooMatrix(int size, bool complex) : Matrix()
 {
     init();
@@ -77,6 +78,31 @@ CooMatrix::CooMatrix(int size, bool complex) : Matrix()
     this->complex = complex;
     this->size = size;
 }
+
+CooMatrix::CooMatrix(Matrix *m)
+{
+    init();
+
+    if (dynamic_cast<CSCMatrix*>(m))
+        this->add_from_csc((CSCMatrix*)m);
+    else if (dynamic_cast<CSRMatrix*>(m))
+        this->add_from_csr((CSRMatrix*)m);
+    else
+        _error("Matrix type not supported.");
+}
+
+CooMatrix::CooMatrix(CSRMatrix *m)
+{
+    init();
+    this->add_from_csr(m);
+}
+
+CooMatrix::CooMatrix(CSCMatrix *m)
+{
+    init();
+    this->add_from_csc(m);
+}
+
 CooMatrix::~CooMatrix()
 {
     this->free_data();
@@ -84,15 +110,61 @@ CooMatrix::~CooMatrix()
 
 void CooMatrix::free_data()
 {
-    // for(std::map<size_t, std::map<size_t, double> >::const_iterator it_row = A.begin(); it_row != A.end(); ++it_row)
-    //     it_row->second.clear();
-    A.clear();
-
-    // for(std::map<size_t, std::map<size_t, cplx> >::const_iterator it_row = A_cplx.begin(); it_row != A_cplx.end(); ++it_row)
-    //    it_row->second.clear();
     A_cplx.clear();
-
+    A.clear();
     this->size = 0;
+}
+
+void CooMatrix::add_from_csr(CSRMatrix *m)
+{
+    free_data();
+
+    this->complex = m->is_complex();
+
+    int *Ap = m->get_Ap();
+    int *Ai = m->get_Ai();
+    double *Ax = m->get_Ax();
+    cplx *Ax_cplx = m->get_Ax_cplx();
+
+    int count = 0;
+    // loop through rows...
+    for (int i = 1; i <= m->get_size(); i++)
+    {
+       for (int j = count; j < Ap[i]; j++)
+       {
+           if (is_complex())
+                add(i-1, Ai[count], Ax_cplx[count]);
+           else
+               add(i-1, Ai[count], Ax[count]);
+           count++;
+       }
+   }
+}
+
+void CooMatrix::add_from_csc(CSCMatrix *m)
+{
+    free_data();
+
+    this->complex = m->is_complex();
+
+    int *Ap = m->get_Ap();
+    int *Ai = m->get_Ai();
+    double *Ax = m->get_Ax();
+    cplx *Ax_cplx = m->get_Ax_cplx();
+
+    int count = 0;
+    // loop through columns...
+    for (int i = 1; i <= m->get_size(); i++)
+    {
+        for (int j = count; j < Ap[i]; j++)
+        {
+            if (is_complex())
+                add(Ai[count], i-1, Ax_cplx[count]);
+            else
+                add(Ai[count], i-1, Ax[count]);
+            count++;
+        }
+    }
 }
 
 void CooMatrix::add(int m, int n, double v)
@@ -480,6 +552,29 @@ CSCMatrix::CSCMatrix(Matrix *m) : Matrix()
         _error("Matrix type not supported.");
 }
 
+CSCMatrix::CSCMatrix(int size, int nnz, int *Ap, int *Ai, double *Ax)
+{
+    this->size = size;
+    this->nnz = nnz;
+    this->complex = false;
+
+    this->Ap = Ap;
+    this->Ai = Ai;
+    this->Ax = Ax;
+}
+
+CSCMatrix::CSCMatrix(int size, int nnz, int *Ap, int *Ai, cplx *Ax_cplx)
+{
+    this->size = size;
+    this->nnz = nnz;
+    this->complex = true;
+
+    this->Ap = Ap;
+    this->Ai = Ai;
+    this->Ax_cplx = Ax_cplx;
+}
+
+
 CSCMatrix::~CSCMatrix()
 {
     free_data();
@@ -680,3 +775,38 @@ void csc_to_csr(int size, int nnz, int *Acp, int *Aci, T *Acx, int *Arp, int *Ar
     csr_to_csc(size, nnz, Acp, Aci, Acx, Arp, Ari, Arx);
 }
 
+template<typename T>
+void csc_to_coo(int size, int nnz, int *Ap, int *Ai, T *Ax, int *row, int *col, T *A)
+{
+    int count = 0;
+    // loop through columns...
+    for (int i = 1; i <= size; i++)
+    {
+        for (int j = count; j < Ap[i]; j++)
+        {
+            A[count] = Ax[count];
+            row[count] = Ai[count];
+            col[count] = i-1;
+
+            count++;
+        }
+    }
+}
+
+template<typename T>
+void csr_to_coo(int size, int nnz, int *Ap, int *Ai, T *Ax, int *row, int *col, T *A)
+{
+    int count = 0;
+    // loop through rows...
+    for (int i = 1; i <= size; i++)
+    {
+       for (int j = count; j < Ap[i]; j++)
+       {
+          A[count] = Ax[count];
+          col[count] = Ai[count];
+          row[count] = i-1;
+
+          count++;
+       }
+   }
+}

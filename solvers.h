@@ -50,14 +50,14 @@ public:
 
     CommonSolverSparseLib()
     {
-        tolerance = 1e-6;
+        tolerance = 1e-8;
         maxiter = 1000;
         method = CommonSolverSparseLibSolver_ConjugateGradientSquared;
     }
 
     bool solve(Matrix *mat, double *res);
     bool solve(Matrix *mat, cplx *res);
-    inline void set_tolerance(int tolerance) { this->tolerance = tolerance; }
+    inline void set_tolerance(double tolerance) { this->tolerance = tolerance; }
     inline void set_maxiter(int maxiter) { this->maxiter = maxiter; }
     inline void set_method(CommonSolverSparseLibSolver method) { this->method = method; }
 
@@ -84,6 +84,7 @@ class CommonSolverSuperLU : public CommonSolver
 {
 public:
     bool solve(Matrix *mat, double *res);
+    bool solve2(Matrix *mat, double *res);
     bool solve(Matrix *mat, cplx *res);
 };
 inline void solve_linear_system_superlu(Matrix *mat, double *res)

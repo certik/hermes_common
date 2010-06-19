@@ -39,38 +39,32 @@ bool CommonSolverUmfpack::solve(Matrix *mat, double *res)
 {
     printf("UMFPACK solver\n");
 
-    CooMatrix *mcoo = dynamic_cast<CooMatrix*>(mat);
+    CSCMatrix *Acsc = NULL;
 
-    int size = mcoo->get_size();
-    int nnz = mcoo->get_nnz();
+    if (CooMatrix *mcoo = dynamic_cast<CooMatrix*>(mat))
+        Acsc = new CSCMatrix(mcoo);
+    else if (CSCMatrix *mcsc = dynamic_cast<CSCMatrix*>(mat))
+        Acsc = mcsc;
+    else if (CSRMatrix *mcsr = dynamic_cast<CSRMatrix*>(mat))
+        Acsc = new CSCMatrix(mcsr);
+    else
+        _error("Matrix type not supported.");
 
-    int *row = new int[nnz];
-    int *col = new int[nnz];
-    double *data = new double[nnz];
+    int nnz = Acsc->get_nnz();
+    int size = Acsc->get_size();
 
-    mcoo->get_row_col_data(row, col, data);
-
-    int *Ap = new int[size + 1];
-    int *Ai = new int[nnz];
-    double *Ax = new double[nnz];
-
+    // solve
     umfpack_di_defaults(control_array);
-
-    /* convert matrix from triplet form to compressed-column form */
-    int status_triplet_to_col = umfpack_di_triplet_to_col(size, size,
-                                                          nnz, row, col, data,
-                                                          Ap, Ai, Ax, NULL);
-    print_status(status_triplet_to_col);
 
     /* symbolic analysis */
     void *symbolic, *numeric;
     int status_symbolic = umfpack_di_symbolic(size, size,
-                                              Ap, Ai, NULL, &symbolic,
+                                              Acsc->get_Ap(), Acsc->get_Ai(), NULL, &symbolic,
                                               control_array, info_array);
     print_status(status_symbolic);
 
     /* LU factorization */
-    int status_numeric = umfpack_di_numeric(Ap, Ai, Ax, symbolic, &numeric,
+    int status_numeric = umfpack_di_numeric(Acsc->get_Ap(), Acsc->get_Ai(), Acsc->get_Ax(), symbolic, &numeric,
                                             control_array, info_array);
     print_status(status_numeric);
 
@@ -81,63 +75,61 @@ bool CommonSolverUmfpack::solve(Matrix *mat, double *res)
 
     /* solve system */
     int status_solve = umfpack_di_solve(UMFPACK_A,
-                                        Ap, Ai, Ax, x, res, numeric,
+                                        Acsc->get_Ap(), Acsc->get_Ai(), Acsc->get_Ax(), x, res, numeric,
                                         control_array, info_array);
 
     print_status(status_solve);
 
     umfpack_di_free_numeric(&numeric);
 
-    delete[] data;
-    delete[] row;
-    delete[] col;
-    delete[] Ap;
-    delete[] Ai;
-    delete[] Ax;
-
     if (symbolic) umfpack_di_free_symbolic(&symbolic);
     if (numeric) umfpack_di_free_numeric(&numeric);
 
     memcpy(res, x, size*sizeof(double));
+
+    if (!dynamic_cast<CSCMatrix*>(mat))
+        delete Acsc;
 }
 
 bool CommonSolverUmfpack::solve(Matrix *mat, cplx *res)
 {
     printf("UMFPACK solver - cplx\n");
 
-    CooMatrix *mcoo = dynamic_cast<CooMatrix*>(mat);
+    CSCMatrix *Acsc = NULL;
 
-    int size = mcoo->get_size();
-    int nnz = mcoo->get_nnz();
+    if (CooMatrix *mcoo = dynamic_cast<CooMatrix*>(mat))
+        Acsc = new CSCMatrix(mcoo);
+    else if (CSCMatrix *mcsc = dynamic_cast<CSCMatrix*>(mat))
+        Acsc = mcsc;
+    else if (CSRMatrix *mcsr = dynamic_cast<CSRMatrix*>(mat))
+        Acsc = new CSCMatrix(mcsr);
+    else
+        _error("Matrix type not supported.");
 
-    int *row = new int[nnz];
-    int *col = new int[nnz];
-    double *data_real = new double[nnz];
-    double *data_imag = new double[nnz];
+    int nnz = Acsc->get_nnz();
+    int size = Acsc->get_size();
 
-    mcoo->get_row_col_data(row, col, data_real, data_imag);
-
-    int *Ap = new int[size + 1];
-    int *Ai = new int[nnz];
+    // complex components
     double *Axr = new double[nnz];
     double *Axi = new double[nnz];
+    cplx *Ax = Acsc->get_Ax_cplx();
+    for (int i = 0; i < nnz; i++)
+    {
+        Axr[i] = Ax[i].real();
+        Axi[i] = Ax[i].imag();
+    }
 
     umfpack_zi_defaults(control_array);
-
-    /* convert matrix from triplet form to compressed-column form */
-    int status_triplet_to_col = umfpack_zi_triplet_to_col(size, size,
-                                                          nnz, row, col, data_real, data_imag, Ap, Ai, Axr, Axi, NULL);
-    print_status(status_triplet_to_col);
 
     /* symbolic analysis */
     void *symbolic, *numeric;
     int status_symbolic = umfpack_zi_symbolic(size, size,
-                                              Ap, Ai, NULL, NULL, &symbolic,
+                                              Acsc->get_Ap(), Acsc->get_Ai(), NULL, NULL, &symbolic,
                                               control_array, info_array);
     print_status(status_symbolic);
 
     /* LU factorization */
-    int status_numeric = umfpack_zi_numeric(Ap, Ai, Axr, Axi, symbolic, &numeric,
+    int status_numeric = umfpack_zi_numeric(Acsc->get_Ap(), Acsc->get_Ai(), Axr, Axi, symbolic, &numeric,
                                             control_array, info_array);
     print_status(status_numeric);
 
@@ -158,29 +150,29 @@ bool CommonSolverUmfpack::solve(Matrix *mat, cplx *res)
 
     /* solve system */
     int status_solve = umfpack_zi_solve(UMFPACK_A,
-                                        Ap, Ai, Axr, Axi, xr, xi, resr, resi, numeric,
+                                        Acsc->get_Ap(), Acsc->get_Ai(), Axr, Axi, xr, xi, resr, resi, numeric,
                                         control_array, info_array);
 
     print_status(status_solve);
 
     umfpack_zi_free_numeric(&numeric);
 
-    delete[] data_real;
-    delete[] data_imag;
     delete[] resr;
     delete[] resi;
-    delete[] row;
-    delete[] col;
-    delete[] Ap;
-    delete[] Ai;
     delete[] Axr;
     delete[] Axi;
 
     if (symbolic) umfpack_di_free_symbolic(&symbolic);
     if (numeric) umfpack_di_free_numeric(&numeric);
 
-    for (int i = 0; i < mcoo->get_size(); i++)
+    for (int i = 0; i < Acsc->get_size(); i++)
         res[i] = cplx(xr[i], xi[i]);
+
+    delete xr;
+    delete xi;
+
+    if (!dynamic_cast<CSCMatrix*>(mat))
+        delete Acsc;
 }
 
 #else

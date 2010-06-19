@@ -6,7 +6,6 @@
 #include "matrix.h"
 #include "solvers.h"
 
-#ifdef COMMON_WITH_SPARSELIB
 #include <coord_double.h>
 #include <compcol_double.h>
 #include <mvvd.h>
@@ -21,25 +20,31 @@
 #include <qmr.h>
 
 bool CommonSolverSparseLib::solve(Matrix *mat, double *res)
-{    
-    CooMatrix *mcoo = dynamic_cast<CooMatrix*>(mat);
+{
+    printf("SparseLib++ solver\n");
 
-    int nnz = mcoo->get_nnz();
-    int *row = new int[nnz];
-    int *col = new int[nnz];
-    double *data = new double[nnz];
+    CSCMatrix *Acsc = NULL;
 
-    mcoo->get_row_col_data(row, col, data);
+    if (CooMatrix *mcoo = dynamic_cast<CooMatrix*>(mat))
+        Acsc = new CSCMatrix(mcoo);
+    else if (CSCMatrix *mcsc = dynamic_cast<CSCMatrix*>(mat))
+        Acsc = mcsc;
+    else if (CSRMatrix *mcsr = dynamic_cast<CSRMatrix*>(mat))
+        Acsc = new CSCMatrix(mcsr);
+    else
+        _error("Matrix type not supported.");
 
-    // matrix
-    Coord_Mat_double Acoo(mcoo->get_size(), mcoo->get_size(), nnz, data, row, col);
-    CompCol_Mat_double Acsc(Acoo);
+    int nnz = Acsc->get_nnz();
+    int size = Acsc->get_size();
+
+    CompCol_Mat_double Acc = CompCol_Mat_double(size, size, nnz,
+                                                Acsc->get_Ax(), Acsc->get_Ai(), Acsc->get_Ap());
 
     // rhs
-    VECTOR_double rhs(res, mcoo->get_size());
+    VECTOR_double rhs(res, size);
 
     // preconditioner
-    CompCol_ILUPreconditioner_double ILU(Acsc);
+    CompCol_ILUPreconditioner_double ILU(Acc);
     VECTOR_double xv = ILU.solve(rhs);
 
     // method
@@ -47,48 +52,34 @@ bool CommonSolverSparseLib::solve(Matrix *mat, double *res)
     switch (method)
     {
     case CommonSolverSparseLibSolver_ConjugateGradientSquared:
-        result = CGS(Acsc, xv, rhs, ILU, maxiter, tolerance);
+        result = CGS(Acc, xv, rhs, ILU, maxiter, tolerance);
         break;
     case CommonSolverSparseLibSolver_RichardsonIterativeRefinement:
-        result = IR(Acsc, xv, rhs, ILU, maxiter, tolerance);
+        result = IR(Acc, xv, rhs, ILU, maxiter, tolerance);
         break;
     default:
-        _error("SparseLib error. Method is not defined.");
+        _error("SparseLib++ error. Method is not defined.");
     }
 
+    printf("SparseLib++ solver: maxiter: %i, tol: %e\n", maxiter, tolerance);
     if (result == 0)
-        printf("SparseLib solver: maxiter: %i, tol: %e\n", maxiter, tolerance);
+        printf("SparseLib++ solver: maxiter: %i, tol: %e\n", maxiter, tolerance);
     else
-        _error("SparseLib error.");
-
-    delete[] data;
-    delete[] row;
-    delete[] col;
+        _error("SparseLib++ error.");
 
     double *x;
-    x = (double*) malloc(mcoo->get_size() * sizeof(double));
+    x = (double*) malloc(size * sizeof(double));
 
     for (int i = 0 ; i < xv.size() ; i++)
         x[i] = xv(i);
 
-    memcpy(res, x, mcoo->get_size()*sizeof(double));
+    memcpy(res, x, size*sizeof(double));
+
+    if (!dynamic_cast<CSCMatrix*>(mat))
+        delete Acsc;
 }
 
 bool CommonSolverSparseLib::solve(Matrix *mat, cplx *res)
 {
     _error("CommonSolverSparseLib::solve(Matrix *mat, cplx *res) not implemented.");
 }
-
-#else
-
-bool CommonSolverSparseLib::solve(Matrix *mat, double *res)
-{
-    _error("CommonSolverSparseLib::solve(Matrix *mat, double *res) not implemented.");
-}
-
-bool CommonSolverSparseLib::solve(Matrix *mat, cplx *res)
-{
-    _error("CommonSolverSparseLib::solve(Matrix *mat, cplx *res) not implemented.");
-}
-
-#endif
