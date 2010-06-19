@@ -305,7 +305,6 @@ void test_solver_sparselib_ir()
     A.add(4, 2, 2);
     A.add(4, 4, 1);
 
-    A.print();
     double res[5] = {8., 45., -3., 3., 19.};
     solve_linear_system_sparselib_ir(&A, res);
     _assert(fabs(res[0] - 1.24489795918367) < EPS);
