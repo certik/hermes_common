@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 # optional functionality
-set(COMMON_WITH_SCIPY NO)
+set(COMMON_WITH_SCIPY YES)
 set(COMMON_WITH_UMFPACK NO)
 set(COMMON_WITH_SUPERLU NO)
 
