@@ -55,7 +55,6 @@ add_custom_command(
     OUTPUT _hermes_common_api.h
     COMMAND cython _hermes_common.pyx
     )
-add_subdirectory(tests)
 
 cython_add_module(_hermes_common stdcython.cpp)
 target_link_libraries(_hermes_common ${HERMES_COMMON})
@@ -87,3 +86,5 @@ if(COMMON_WITH_SUPERLU)
     include_directories(${SUPERLU_INCLUDE_DIR})
     target_link_libraries(${HERMES_COMMON} ${SUPERLU_LIBRARY})
 endif(COMMON_WITH_SUPERLU)
+
+add_subdirectory(tests)
