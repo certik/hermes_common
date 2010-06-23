@@ -4,7 +4,8 @@
 #include "matrix.h"
 #include "solvers.h"
 
-#define EPS 1e-6
+#define EPS 1e-12
+#define EPS_LOW 1e-6
 
 #define ERROR_SUCCESS                               0
 #define ERROR_FAILURE                              -1
@@ -307,11 +308,11 @@ void test_solver_sparselib_ir()
 
     double res[5] = {8., 45., -3., 3., 19.};
     solve_linear_system_sparselib_ir(&A, res);
-    _assert(fabs(res[0] - 1.24489795918367) < EPS);
-    _assert(fabs(res[1] - 1.83673469387755) < EPS);
-    _assert(fabs(res[2] - 3.00000000000000) < EPS);
-    _assert(fabs(res[3] - 3.91836734693878) < EPS);
-    _assert(fabs(res[4] - 5.65306122448980) < EPS);
+    _assert(fabs(res[0] - 1.24489795918367) < EPS_LOW);
+    _assert(fabs(res[1] - 1.83673469387755) < EPS_LOW);
+    _assert(fabs(res[2] - 3.00000000000000) < EPS_LOW);
+    _assert(fabs(res[3] - 3.91836734693878) < EPS_LOW);
+    _assert(fabs(res[4] - 5.65306122448980) < EPS_LOW);
 }
 
 void test_solver_superlu()
