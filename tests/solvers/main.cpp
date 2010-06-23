@@ -70,6 +70,29 @@ void test_solver_dense_lu2()
     _assert(fabs(res[3] - 0.2) < EPS);
 }
 
+void test_solver_cg()
+{
+    CooMatrix A(4);
+    A.add(0, 0, -1);
+    A.add(1, 1, -1);
+    A.add(2, 2, -1);
+    A.add(3, 3, -1);
+    A.add(0, 1, 2);
+    A.add(1, 0, 2);
+    A.add(1, 2, 2);
+    A.add(2, 1, 2);
+    A.add(2, 3, 2);
+    A.add(3, 2, 2);
+
+    double res[4] = {1., 1., 1., 1.};
+
+    _assert(solve_linear_system_cg(&A, res, EPS, 2) == 1);
+    _assert(fabs(res[0] - 0.2) < EPS);
+    _assert(fabs(res[1] - 0.6) < EPS);
+    _assert(fabs(res[2] - 0.6) < EPS);
+    _assert(fabs(res[3] - 0.2) < EPS);
+}
+
 void test_solver_scipy_1()
 {
     CooMatrix A(4);
@@ -406,6 +429,8 @@ int main(int argc, char* argv[])
         // fails to convert the matrix:
         //test_solver_dense_lu1();
         //test_solver_dense_lu2();
+        // fails to converge:
+        //test_solver_cg();
 
         // NumPy + SciPy
 #ifdef COMMON_WITH_SCIPY

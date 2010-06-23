@@ -33,17 +33,17 @@ public:
                int maxiter);
     bool solve(Matrix *mat, cplx *res);
 };
-inline void solve_linear_system_cg(Matrix *mat, double *res,
+inline bool solve_linear_system_cg(Matrix *mat, double *res,
                                    double tol,
                                    int maxiter)
 {
     CommonSolverCG solver;
-    solver.solve(mat, res, tol, maxiter);
+    return solver.solve(mat, res, tol, maxiter);
 }
-inline void solve_linear_system_cg(Matrix *mat, cplx *res)
+inline bool solve_linear_system_cg(Matrix *mat, cplx *res)
 {
     CommonSolverCG solver;
-    solver.solve(mat, res);
+    return solver.solve(mat, res);
 }
 
 // c++ lu
