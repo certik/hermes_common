@@ -93,3 +93,5 @@ if(NOT MSVC)
     target_link_libraries(${HERMES_COMMON} "rt")
   ENDIF(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif(NOT MSVC)
+
+add_subdirectory(tests)
